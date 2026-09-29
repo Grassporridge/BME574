@@ -53,47 +53,23 @@ Ma et al., not as direct clinical concentrations without an additional dimension
 
 The five-state ODE system is:
 
-\[
-\frac{dn_s}{d\tau}=(g-l)n_s
-\]
-
-\[
-\frac{dn_r}{d\tau}=(\alpha g-\beta l)n_r
-\]
-
-\[
-\frac{ds}{d\tau}=(\xi l-g)n_s+(\xi\beta l-\alpha g)n_r
-\]
-
-\[
-\frac{da}{d\tau}=-\kappa_bba-\phi n_ra-d_aa
-\]
-
-\[
-\frac{db}{d\tau}=\beta l n_r-d_b\iota b.
-\]
+~~~text
+dnₛ/dτ = (g − l)nₛ
+dnᵣ/dτ = (αg − βl)nᵣ
+ds/dτ  = (ξl − g)nₛ + (ξβl − αg)nᵣ
+da/dτ  = −κ_bba − φnᵣa − dₐa
+db/dτ  = βlnᵣ − dᵦιb
+~~~
 
 The closure relations are:
 
-\[
-g=\frac{s}{1+s}
-\]
-
-\[
-l=\gamma\frac{a^{h_a}}{1+a^{h_a}}g
-\]
-
-\[
-\iota=\frac{i^{h_i}}{1+i^{h_i}}
-\]
-
-\[
-\beta=\beta_{\min}+c(1-\beta_{\min})\iota
-\]
-
-\[
-\phi=\phi_{\max}(1-c\iota).
-\]
+~~~text
+g = s/(1 + s)
+l = γ[aʰᵃ/(1 + aʰᵃ)]g
+ι = iʰⁱ/(1 + iʰⁱ)
+β = βₘᵢₙ + c(1 − βₘᵢₙ)ι
+φ = φₘₐₓ(1 − cι)
+~~~
 
 Here:
 
@@ -110,15 +86,15 @@ Here:
 
 The paper’s general selection criterion is:
 
-\[
-1-\beta>\frac{1-\alpha}{l/g}.
-\]
+~~~text
+1 − β > (1 − α)/(l/g)
+~~~
 
 Under saturating antibiotic and inhibitor concentrations, the simplified criterion is:
 
-\[
-(1-c)(1-\beta_{\min})>\frac{1-\alpha}{\gamma}.
-\]
+~~~text
+(1 − c)(1 − βₘᵢₙ) > (1 − α)/γ
+~~~
 
 These criteria are interpretation tools. Dynamic simulations are still required because the
 populations continuously change the antibiotic, Bla, and nutrient environment.
@@ -147,11 +123,9 @@ and preserve the shared baseline for comparison.
 
 Default initial conditions are:
 
-\[
-n_s(0)=0.2,\quad n_r(0)=0.2,\quad s(0)=4,\quad b(0)=0,
-\]
-
-with 'a(0)=a0'.
+~~~text
+nₛ(0) = 0.2,  nᵣ(0) = 0.2,  s(0) = 4,  b(0) = 0,  a(0) = a₀
+~~~
 
 ## Person 1–Person 4 task schema
 
@@ -227,14 +201,8 @@ recovery and ecological outcomes.
 
 All workstreams should use the same definitions unless a report explicitly justifies an alternative:
 
-- final resistant fraction:
-  \[
-  f_R=\frac{n_r}{n_s+n_r};
-  \]
-- two-population Shannon diversity:
-  \[
-  H=-f_S\ln(f_S)-f_R\ln(f_R);
-  \]
+- final resistant fraction: fᵣ = nᵣ/(nₛ + nᵣ);
+- two-population Shannon diversity: H = −fₛ ln(fₛ) − fᵣ ln(fᵣ);
 - final total live biomass 'n_s+n_r';
 - time to numerical steady state;
 - resistant extinction and susceptible survival flags;

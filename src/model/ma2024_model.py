@@ -311,8 +311,8 @@ def reproduce_fig3c(n_strains: int = 300, seed: int = 0,
     ax.plot(lims, lims, "k-", linewidth=1, label="y = x (criterion boundary)")
     ax.set_xlim(lims)
     ax.set_ylim(lims)
-    ax.set_xlabel(r"$(1-\alpha)/\gamma$")
-    ax.set_ylabel(r"$(1-c)(1-\beta_{min})$")
+    ax.set_xlabel("(1−α)/γ")
+    ax.set_ylabel("(1−c)(1−βₘᵢₙ)")
     ax.set_title(f"Criterion check ({agreement:.0%} agreement)\n"
                  "red = resistant fraction grew, blue = it shrank")
     ax.legend(fontsize=8)
