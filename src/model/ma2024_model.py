@@ -35,6 +35,12 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from dataclasses import dataclass, replace
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+FIGURE_DIR = PROJECT_ROOT / "results" / "figures"
+FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ---------------------------------------------------------------------------
@@ -226,8 +232,9 @@ def reproduce_fig2c(p: Params = DEFAULT_PARAMS, a0: float = 2.15, i_dose: float 
     ax2.set_title("Resistant fraction over time")
 
     fig.tight_layout()
-    fig.savefig("fig2c_reproduction.png", dpi=150)
-    print("Saved fig2c_reproduction.png")
+    output = FIGURE_DIR / "fig2c_reproduction.png"
+    fig.savefig(output, dpi=150)
+    print(f"Saved {output}")
     return sol
 
 
@@ -310,8 +317,9 @@ def reproduce_fig3c(n_strains: int = 300, seed: int = 0,
                  "red = resistant fraction grew, blue = it shrank")
     ax.legend(fontsize=8)
     fig.tight_layout()
-    fig.savefig("fig3c_reproduction.png", dpi=150)
-    print("Saved fig3c_reproduction.png")
+    output = FIGURE_DIR / "fig3c_reproduction.png"
+    fig.savefig(output, dpi=150)
+    print(f"Saved {output}")
     return x_vals, y_vals, outcome
 
 

@@ -68,7 +68,7 @@ from scipy.integrate import solve_ivp
 from dataclasses import replace
 from typing import NamedTuple
 
-from ma2024_model import (
+from ..model.ma2024_model import (
     Params, DEFAULT_PARAMS, default_y0, hill, growth_rate, inhibitor_effect, beta_of, phi_of,
     simulate as simulate_raw,
 )
