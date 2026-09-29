@@ -261,10 +261,13 @@ member’s report.
 
 ## Running the project
 
-The project is intended to run in the 'biobase' environment:
+The project is intended to run in the minimal 'ar_cp' environment defined in
+[environment.yml](environment.yml). It contains Python 3.11, NumPy, SciPy, pandas, Matplotlib,
+and ipykernel for notebook-kernel support.
 
 ~~~bash
-conda activate biobase
+conda env create -f environment.yml
+conda activate ar_cp
 ~~~
 
 From the repository root, import the shared package with:
@@ -277,7 +280,7 @@ from src.analysis.sweep_engine import compute_endpoints
 To reproduce the model’s standalone validation plots:
 
 ~~~bash
-conda run -n biobase python -m src.model.ma2024_model
+conda run -n ar_cp python -m src.model.ma2024_model
 ~~~
 
 Those plots are written to 'results/figures/'.
