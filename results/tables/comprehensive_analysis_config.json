@@ -1,0 +1,47 @@
+{
+  "analysis": "Person 3 comprehensive inhibitor pharmacodynamics",
+  "repository_location": "BME574 results/",
+  "joint_grid": {
+    "i": [
+      0.1,
+      10.0,
+      21,
+      "log-spaced"
+    ],
+    "h_i": [
+      1.0,
+      5.0,
+      21,
+      "linear"
+    ],
+    "d_b": [
+      1.0,
+      10.0,
+      21,
+      "linear"
+    ]
+  },
+  "a0": 2.15,
+  "horizon": 300.0,
+  "time_points": 301,
+  "representative_trace_horizon": 60.0,
+  "solver": {
+    "method": "LSODA",
+    "rtol": 3e-07,
+    "atol": 1e-09,
+    "max_step": 2.0
+  },
+  "shared_steady_state": {
+    "per_capita_growth_tolerance": 0.001,
+    "hold_fraction": 0.1
+  },
+  "recovery": {
+    "fraction": 0.9,
+    "own_treatment_final_and_no_treatment_reference_both_reported": true
+  },
+  "viability_fraction_of_no_treatment_susceptible": 0.5,
+  "individual_extinction_threshold": 0.0001,
+  "community_extinction_threshold": 1e-06,
+  "dominance_threshold": 0.75,
+  "rows": 9261
+}

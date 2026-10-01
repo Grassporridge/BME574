@@ -1,0 +1,181 @@
+parameter,bin,parameter_mean,regime,n,fraction
+i,"(0.099, 0.158]",0.12812728680850932,community extinct,0,0.0
+i,"(0.099, 0.158]",0.12812728680850932,nonconverged near-extinction,0,0.0
+i,"(0.099, 0.158]",0.12812728680850932,nonconverged viable density,0,0.0
+i,"(0.099, 0.158]",0.12812728680850932,susceptible-dominated,0,0.0
+i,"(0.099, 0.158]",0.12812728680850932,resistant-dominated,0,0.0
+i,"(0.099, 0.158]",0.12812728680850932,mixed community,1323,1.0
+i,"(0.158, 0.251]",0.22535743732392302,community extinct,0,0.0
+i,"(0.158, 0.251]",0.22535743732392302,nonconverged near-extinction,0,0.0
+i,"(0.158, 0.251]",0.22535743732392302,nonconverged viable density,0,0.0
+i,"(0.158, 0.251]",0.22535743732392302,susceptible-dominated,0,0.0
+i,"(0.158, 0.251]",0.22535743732392302,resistant-dominated,0,0.0
+i,"(0.158, 0.251]",0.22535743732392302,mixed community,882,1.0
+i,"(0.251, 0.398]",0.35716746828516754,community extinct,0,0.0
+i,"(0.251, 0.398]",0.35716746828516754,nonconverged near-extinction,0,0.0
+i,"(0.251, 0.398]",0.35716746828516754,nonconverged viable density,0,0.0
+i,"(0.251, 0.398]",0.35716746828516754,susceptible-dominated,0,0.0
+i,"(0.251, 0.398]",0.35716746828516754,resistant-dominated,0,0.0
+i,"(0.251, 0.398]",0.35716746828516754,mixed community,882,1.0
+i,"(0.398, 0.631]",0.5660722890537329,community extinct,0,0.0
+i,"(0.398, 0.631]",0.5660722890537329,nonconverged near-extinction,0,0.0
+i,"(0.398, 0.631]",0.5660722890537329,nonconverged viable density,0,0.0
+i,"(0.398, 0.631]",0.5660722890537329,susceptible-dominated,0,0.0
+i,"(0.398, 0.631]",0.5660722890537329,resistant-dominated,0,0.0
+i,"(0.398, 0.631]",0.5660722890537329,mixed community,882,1.0
+i,"(0.631, 1.0]",0.8971641173621405,community extinct,0,0.0
+i,"(0.631, 1.0]",0.8971641173621405,nonconverged near-extinction,0,0.0
+i,"(0.631, 1.0]",0.8971641173621405,nonconverged viable density,0,0.0
+i,"(0.631, 1.0]",0.8971641173621405,susceptible-dominated,0,0.0
+i,"(0.631, 1.0]",0.8971641173621405,resistant-dominated,0,0.0
+i,"(0.631, 1.0]",0.8971641173621405,mixed community,882,1.0
+i,"(1.0, 1.585]",1.4219093021276408,community extinct,0,0.0
+i,"(1.0, 1.585]",1.4219093021276408,nonconverged near-extinction,0,0.0
+i,"(1.0, 1.585]",1.4219093021276408,nonconverged viable density,0,0.0
+i,"(1.0, 1.585]",1.4219093021276408,susceptible-dominated,0,0.0
+i,"(1.0, 1.585]",1.4219093021276408,resistant-dominated,0,0.0
+i,"(1.0, 1.585]",1.4219093021276408,mixed community,882,1.0
+i,"(1.585, 2.512]",2.25357437323923,community extinct,0,0.0
+i,"(1.585, 2.512]",2.25357437323923,nonconverged near-extinction,0,0.0
+i,"(1.585, 2.512]",2.25357437323923,nonconverged viable density,0,0.0
+i,"(1.585, 2.512]",2.25357437323923,susceptible-dominated,0,0.0
+i,"(1.585, 2.512]",2.25357437323923,resistant-dominated,0,0.0
+i,"(1.585, 2.512]",2.25357437323923,mixed community,882,1.0
+i,"(2.512, 3.981]",3.571674682851676,community extinct,0,0.0
+i,"(2.512, 3.981]",3.571674682851676,nonconverged near-extinction,0,0.0
+i,"(2.512, 3.981]",3.571674682851676,nonconverged viable density,0,0.0
+i,"(2.512, 3.981]",3.571674682851676,susceptible-dominated,0,0.0
+i,"(2.512, 3.981]",3.571674682851676,resistant-dominated,0,0.0
+i,"(2.512, 3.981]",3.571674682851676,mixed community,882,1.0
+i,"(3.981, 6.31]",5.660722890537329,community extinct,0,0.0
+i,"(3.981, 6.31]",5.660722890537329,nonconverged near-extinction,0,0.0
+i,"(3.981, 6.31]",5.660722890537329,nonconverged viable density,0,0.0
+i,"(3.981, 6.31]",5.660722890537329,susceptible-dominated,0,0.0
+i,"(3.981, 6.31]",5.660722890537329,resistant-dominated,0,0.0
+i,"(3.981, 6.31]",5.660722890537329,mixed community,882,1.0
+i,"(6.31, 10.0]",8.971641173621407,community extinct,0,0.0
+i,"(6.31, 10.0]",8.971641173621407,nonconverged near-extinction,0,0.0
+i,"(6.31, 10.0]",8.971641173621407,nonconverged viable density,0,0.0
+i,"(6.31, 10.0]",8.971641173621407,susceptible-dominated,0,0.0
+i,"(6.31, 10.0]",8.971641173621407,resistant-dominated,0,0.0
+i,"(6.31, 10.0]",8.971641173621407,mixed community,882,1.0
+h_i,"(0.999, 1.4]",1.2,community extinct,0,0.0
+h_i,"(0.999, 1.4]",1.2,nonconverged near-extinction,0,0.0
+h_i,"(0.999, 1.4]",1.2,nonconverged viable density,0,0.0
+h_i,"(0.999, 1.4]",1.2,susceptible-dominated,0,0.0
+h_i,"(0.999, 1.4]",1.2,resistant-dominated,0,0.0
+h_i,"(0.999, 1.4]",1.2,mixed community,1323,1.0
+h_i,"(1.4, 1.8]",1.7000000000000004,community extinct,0,0.0
+h_i,"(1.4, 1.8]",1.7000000000000004,nonconverged near-extinction,0,0.0
+h_i,"(1.4, 1.8]",1.7000000000000004,nonconverged viable density,0,0.0
+h_i,"(1.4, 1.8]",1.7000000000000004,susceptible-dominated,0,0.0
+h_i,"(1.4, 1.8]",1.7000000000000004,resistant-dominated,0,0.0
+h_i,"(1.4, 1.8]",1.7000000000000004,mixed community,882,1.0
+h_i,"(1.8, 2.2]",2.0999999999999996,community extinct,0,0.0
+h_i,"(1.8, 2.2]",2.0999999999999996,nonconverged near-extinction,0,0.0
+h_i,"(1.8, 2.2]",2.0999999999999996,nonconverged viable density,0,0.0
+h_i,"(1.8, 2.2]",2.0999999999999996,susceptible-dominated,0,0.0
+h_i,"(1.8, 2.2]",2.0999999999999996,resistant-dominated,0,0.0
+h_i,"(1.8, 2.2]",2.0999999999999996,mixed community,882,1.0
+h_i,"(2.2, 2.6]",2.5,community extinct,0,0.0
+h_i,"(2.2, 2.6]",2.5,nonconverged near-extinction,0,0.0
+h_i,"(2.2, 2.6]",2.5,nonconverged viable density,0,0.0
+h_i,"(2.2, 2.6]",2.5,susceptible-dominated,0,0.0
+h_i,"(2.2, 2.6]",2.5,resistant-dominated,0,0.0
+h_i,"(2.2, 2.6]",2.5,mixed community,882,1.0
+h_i,"(2.6, 3.0]",2.9,community extinct,0,0.0
+h_i,"(2.6, 3.0]",2.9,nonconverged near-extinction,0,0.0
+h_i,"(2.6, 3.0]",2.9,nonconverged viable density,0,0.0
+h_i,"(2.6, 3.0]",2.9,susceptible-dominated,0,0.0
+h_i,"(2.6, 3.0]",2.9,resistant-dominated,0,0.0
+h_i,"(2.6, 3.0]",2.9,mixed community,882,1.0
+h_i,"(3.0, 3.4]",3.3,community extinct,0,0.0
+h_i,"(3.0, 3.4]",3.3,nonconverged near-extinction,0,0.0
+h_i,"(3.0, 3.4]",3.3,nonconverged viable density,0,0.0
+h_i,"(3.0, 3.4]",3.3,susceptible-dominated,0,0.0
+h_i,"(3.0, 3.4]",3.3,resistant-dominated,0,0.0
+h_i,"(3.0, 3.4]",3.3,mixed community,882,1.0
+h_i,"(3.4, 3.8]",3.6999999999999997,community extinct,0,0.0
+h_i,"(3.4, 3.8]",3.6999999999999997,nonconverged near-extinction,0,0.0
+h_i,"(3.4, 3.8]",3.6999999999999997,nonconverged viable density,0,0.0
+h_i,"(3.4, 3.8]",3.6999999999999997,susceptible-dominated,0,0.0
+h_i,"(3.4, 3.8]",3.6999999999999997,resistant-dominated,0,0.0
+h_i,"(3.4, 3.8]",3.6999999999999997,mixed community,882,1.0
+h_i,"(3.8, 4.2]",4.1000000000000005,community extinct,0,0.0
+h_i,"(3.8, 4.2]",4.1000000000000005,nonconverged near-extinction,0,0.0
+h_i,"(3.8, 4.2]",4.1000000000000005,nonconverged viable density,0,0.0
+h_i,"(3.8, 4.2]",4.1000000000000005,susceptible-dominated,0,0.0
+h_i,"(3.8, 4.2]",4.1000000000000005,resistant-dominated,0,0.0
+h_i,"(3.8, 4.2]",4.1000000000000005,mixed community,882,1.0
+h_i,"(4.2, 4.6]",4.5,community extinct,0,0.0
+h_i,"(4.2, 4.6]",4.5,nonconverged near-extinction,0,0.0
+h_i,"(4.2, 4.6]",4.5,nonconverged viable density,0,0.0
+h_i,"(4.2, 4.6]",4.5,susceptible-dominated,0,0.0
+h_i,"(4.2, 4.6]",4.5,resistant-dominated,0,0.0
+h_i,"(4.2, 4.6]",4.5,mixed community,882,1.0
+h_i,"(4.6, 5.0]",4.8999999999999995,community extinct,0,0.0
+h_i,"(4.6, 5.0]",4.8999999999999995,nonconverged near-extinction,0,0.0
+h_i,"(4.6, 5.0]",4.8999999999999995,nonconverged viable density,0,0.0
+h_i,"(4.6, 5.0]",4.8999999999999995,susceptible-dominated,0,0.0
+h_i,"(4.6, 5.0]",4.8999999999999995,resistant-dominated,0,0.0
+h_i,"(4.6, 5.0]",4.8999999999999995,mixed community,882,1.0
+d_b,"(0.999, 1.9]",1.45,community extinct,0,0.0
+d_b,"(0.999, 1.9]",1.45,nonconverged near-extinction,0,0.0
+d_b,"(0.999, 1.9]",1.45,nonconverged viable density,0,0.0
+d_b,"(0.999, 1.9]",1.45,susceptible-dominated,0,0.0
+d_b,"(0.999, 1.9]",1.45,resistant-dominated,0,0.0
+d_b,"(0.999, 1.9]",1.45,mixed community,1323,1.0
+d_b,"(1.9, 2.8]",2.575,community extinct,0,0.0
+d_b,"(1.9, 2.8]",2.575,nonconverged near-extinction,0,0.0
+d_b,"(1.9, 2.8]",2.575,nonconverged viable density,0,0.0
+d_b,"(1.9, 2.8]",2.575,susceptible-dominated,0,0.0
+d_b,"(1.9, 2.8]",2.575,resistant-dominated,0,0.0
+d_b,"(1.9, 2.8]",2.575,mixed community,882,1.0
+d_b,"(2.8, 3.7]",3.475000000000001,community extinct,0,0.0
+d_b,"(2.8, 3.7]",3.475000000000001,nonconverged near-extinction,0,0.0
+d_b,"(2.8, 3.7]",3.475000000000001,nonconverged viable density,0,0.0
+d_b,"(2.8, 3.7]",3.475000000000001,susceptible-dominated,0,0.0
+d_b,"(2.8, 3.7]",3.475000000000001,resistant-dominated,0,0.0
+d_b,"(2.8, 3.7]",3.475000000000001,mixed community,882,1.0
+d_b,"(3.7, 4.6]",4.375,community extinct,0,0.0
+d_b,"(3.7, 4.6]",4.375,nonconverged near-extinction,0,0.0
+d_b,"(3.7, 4.6]",4.375,nonconverged viable density,0,0.0
+d_b,"(3.7, 4.6]",4.375,susceptible-dominated,0,0.0
+d_b,"(3.7, 4.6]",4.375,resistant-dominated,0,0.0
+d_b,"(3.7, 4.6]",4.375,mixed community,882,1.0
+d_b,"(4.6, 5.5]",5.2749999999999995,community extinct,0,0.0
+d_b,"(4.6, 5.5]",5.2749999999999995,nonconverged near-extinction,0,0.0
+d_b,"(4.6, 5.5]",5.2749999999999995,nonconverged viable density,0,0.0
+d_b,"(4.6, 5.5]",5.2749999999999995,susceptible-dominated,0,0.0
+d_b,"(4.6, 5.5]",5.2749999999999995,resistant-dominated,0,0.0
+d_b,"(4.6, 5.5]",5.2749999999999995,mixed community,882,1.0
+d_b,"(5.5, 6.4]",6.175000000000001,community extinct,0,0.0
+d_b,"(5.5, 6.4]",6.175000000000001,nonconverged near-extinction,0,0.0
+d_b,"(5.5, 6.4]",6.175000000000001,nonconverged viable density,0,0.0
+d_b,"(5.5, 6.4]",6.175000000000001,susceptible-dominated,0,0.0
+d_b,"(5.5, 6.4]",6.175000000000001,resistant-dominated,0,0.0
+d_b,"(5.5, 6.4]",6.175000000000001,mixed community,882,1.0
+d_b,"(6.4, 7.3]",7.074999999999999,community extinct,0,0.0
+d_b,"(6.4, 7.3]",7.074999999999999,nonconverged near-extinction,0,0.0
+d_b,"(6.4, 7.3]",7.074999999999999,nonconverged viable density,0,0.0
+d_b,"(6.4, 7.3]",7.074999999999999,susceptible-dominated,0,0.0
+d_b,"(6.4, 7.3]",7.074999999999999,resistant-dominated,0,0.0
+d_b,"(6.4, 7.3]",7.074999999999999,mixed community,882,1.0
+d_b,"(7.3, 8.2]",7.9750000000000005,community extinct,0,0.0
+d_b,"(7.3, 8.2]",7.9750000000000005,nonconverged near-extinction,0,0.0
+d_b,"(7.3, 8.2]",7.9750000000000005,nonconverged viable density,0,0.0
+d_b,"(7.3, 8.2]",7.9750000000000005,susceptible-dominated,0,0.0
+d_b,"(7.3, 8.2]",7.9750000000000005,resistant-dominated,0,0.0
+d_b,"(7.3, 8.2]",7.9750000000000005,mixed community,882,1.0
+d_b,"(8.2, 9.1]",8.875,community extinct,0,0.0
+d_b,"(8.2, 9.1]",8.875,nonconverged near-extinction,0,0.0
+d_b,"(8.2, 9.1]",8.875,nonconverged viable density,0,0.0
+d_b,"(8.2, 9.1]",8.875,susceptible-dominated,0,0.0
+d_b,"(8.2, 9.1]",8.875,resistant-dominated,0,0.0
+d_b,"(8.2, 9.1]",8.875,mixed community,882,1.0
+d_b,"(9.1, 10.0]",9.774999999999999,community extinct,0,0.0
+d_b,"(9.1, 10.0]",9.774999999999999,nonconverged near-extinction,0,0.0
+d_b,"(9.1, 10.0]",9.774999999999999,nonconverged viable density,0,0.0
+d_b,"(9.1, 10.0]",9.774999999999999,susceptible-dominated,0,0.0
+d_b,"(9.1, 10.0]",9.774999999999999,resistant-dominated,0,0.0
+d_b,"(9.1, 10.0]",9.774999999999999,mixed community,882,1.0

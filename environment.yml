@@ -7,4 +7,5 @@ dependencies:
   - scipy
   - pandas
   - matplotlib
+  - reportlab
   - ipykernel

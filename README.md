@@ -227,15 +227,22 @@ BME574/
 │   │   └── ma2024_model.py
 │   ├── analysis/
 │   │   ├── sweep_engine.py
-│   │   └── grid_runner.py
+│   │   ├── grid_runner.py
+│   │   ├── person3_expanded_analysis.py
+│   │   └── person3_comprehensive_analysis.py
 │   └── visualization/
 │       └── plot_style.py
 └── results/
     ├── tables/
     │   ├── treatment_grid.csv
-    │   └── criterion_grid.csv
+    │   ├── criterion_grid.csv
+    │   └── Person 3 analysis tables (comprehensive_*.csv)
     ├── figures/
+    │   └── Person 3 figures (PNG and PDF pairs)
     └── reports/
+        └── Person_3_Expanded_Report.pdf
+docs/
+└── Person_3_Plan.md
 ~~~
 
 ### Where to find shared project components
@@ -250,20 +257,46 @@ BME574/
 - **Structured parameter-grid execution:** [src/analysis/grid_runner.py](src/analysis/grid_runner.py)
 - **Shared color and plot conventions:** [src/visualization/plot_style.py](src/visualization/plot_style.py)
 - **Reproducible walkthrough:** [notebooks/01_sweep_execution.ipynb](notebooks/01_sweep_execution.ipynb)
-- **Existing tabular outputs:** [results/tables/](results/tables/)
-- **Future generated plots:** [results/figures/](results/figures/)
-- **Future written reports:** [results/reports/](results/reports/)
+- **Tabular outputs:** [results/tables/](results/tables/)
+- **Generated plots (PNG and PDF):** [results/figures/](results/figures/)
+- **Written reports:** [results/reports/](results/reports/)
+- **Person 3 work plan and coordination items:** [docs/Person_3_Plan.md](docs/Person_3_Plan.md)
 
-The 'results/reports/' directory is intentionally empty in the repository. Put member reports,
-combined reports, and report-specific supplementary documents there using descriptive names such
-as 'person3_inhibitor_pharmacodynamics.pdf' or 'final_group_report.pdf'. Do not overwrite another
-member’s report.
+Member reports, combined reports, and report-specific supplementary documents belong in
+'results/reports/' with descriptive names. Do not overwrite another member’s report.
+
+## Person 3 — inhibitor pharmacodynamics results
+
+The Person 3 sweep varies inhibitor dose 'i', inhibitor Hill coefficient 'h_i', and free-Bla
+inactivation rate 'd_b'. Its matched comprehensive grid has 21 values per parameter (9,261
+simulations) at antibiotic anchor 'a0 = 2.15'; the earlier multi-anchor atlas, composition,
+robustness, ablation, and identifiability analyses are also included in the expanded report.
+
+- **Report:** [results/reports/Person_3_Expanded_Report.pdf](results/reports/Person_3_Expanded_Report.pdf)
+- **Full Person 3 plan:** [docs/Person_3_Plan.md](docs/Person_3_Plan.md)
+- **Expanded analysis:** [src/analysis/person3_expanded_analysis.py](src/analysis/person3_expanded_analysis.py)
+- **Matched comprehensive sweep and report builder:** [src/analysis/person3_comprehensive_analysis.py](src/analysis/person3_comprehensive_analysis.py)
+- **Run-level 9,261-row sweep:** [results/tables/comprehensive_inhibitor_grid_a0_2p15.csv](results/tables/comprehensive_inhibitor_grid_a0_2p15.csv)
+- **All tables:** [results/tables/](results/tables/) (the comprehensive sweep products use the 'comprehensive_' prefix)
+- **All figures:** [results/figures/](results/figures/) (each plot is provided in PNG and PDF)
+
+The checked-in outputs can be reproduced from the repository root with the 'ar_cp' environment:
+
+~~~bash
+conda run -n ar_cp python -m src.analysis.person3_comprehensive_analysis
+~~~
+
+This rebuilds the full 9,261-run sweep and its matched-analysis report appendix, using the
+checked-in Person 3 atlas tables as inputs to preserve the earlier analyses. To regenerate the
+multi-anchor atlas and its source tables as well, run 'src.analysis.person3_expanded_analysis';
+that full analysis takes substantially longer. See the plan and report for parameter ranges,
+solver tolerances, endpoint definitions, interpretation, and coordination caveats.
 
 ## Running the project
 
 The project is intended to run in the minimal 'ar_cp' environment defined in
 [environment.yml](environment.yml). It contains Python 3.11, NumPy, SciPy, pandas, Matplotlib,
-and ipykernel for notebook-kernel support.
+reportlab for PDF report generation, and ipykernel for notebook-kernel support.
 
 ~~~bash
 conda env create -f environment.yml

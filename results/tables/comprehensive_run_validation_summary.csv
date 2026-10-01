@@ -1,0 +1,2 @@
+n,solver_success_fraction,ss_converged_fraction,criterion_agreement_fraction,static_criterion_R_fraction,simulated_R_favored_fraction,resistant_eliminated_fraction,sensitive_survives_fraction,fraction_susceptible-enriched,fraction_resistant-enriched,fraction_neutral
+9261,1.0,1.0,0.7866321131627254,0.6507936507936508,0.4374257639563762,0.0,1.0,0.5539358600583091,0.42684375337436564,0.019220386567325342
