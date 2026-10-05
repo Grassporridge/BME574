@@ -1,0 +1,22 @@
+{
+  "variable_affinity": true,
+  "starvation_mortality": true,
+  "structured_community": false,
+  "affinity_log_sd": 0.7,
+  "starvation_mean": 0.06,
+  "starvation_sd": 0.015,
+  "seed": 42,
+  "n_species": 25,
+  "t_end": 300.0,
+  "n_times": 1201,
+  "growth_mean": 0.5,
+  "growth_sd": 0.15,
+  "growth_reference": 1.0,
+  "death_mean": 0.01,
+  "death_sd": 0.003,
+  "initial_biomass": 0.01,
+  "initial_resource": 1.0,
+  "half_saturation": 0.1,
+  "leakage": 0.2,
+  "extinction_fraction": 1e-06
+}

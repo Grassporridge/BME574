@@ -1,0 +1,15 @@
+Figure 1. Shannon H (natural logarithm), effective diversity exp(H), species remaining above the cutoff, and total living biomass. The first four scenarios share growth, baseline death, permissions, secretion and initial abundance draws. The structured scenario changes several traits jointly, so its difference cannot be attributed to one mechanism. Shannon is undefined when total biomass is zero.
+
+Figure 2. Realized traits in the both scenario. Lower K means uptake remains more efficient at low chemical concentration. Maximum uptake is zero for forbidden foods. Growth capacity, death parameters and K were sampled independently; no growth-survival or growth-affinity tradeoff was imposed. Secretion allocations describe potential output when R0 is actually consumed.
+
+Figure 3 (both). Species biomass, composition, chemical depletion and an early-time chemical zoom. M1/M2 begin at zero and accumulate only through R0 consumption. Log plots show extinct species at a display floor, not positive simulated biomass. Percentages can rise while absolute biomass falls. Species colors are consistent across these panels.
+
+Figure 3 (structured). Species biomass, composition, chemical depletion and an early-time chemical zoom. M1/M2 begin at zero and accumulate only through R0 consumption. Log plots show extinct species at a display floor, not positive simulated biomass. Percentages can rise while absolute biomass falls. Species colors are consistent across these panels.
+
+Figure 4. Resource-limited gross growth, starvation-dependent mortality, net growth and community biomass fluxes in the both scenario. Death rises toward baseline plus starvation increment as food-supported growth approaches zero. Negative net growth means biomass decreases; it does not mean immediate extinction. Rates after irreversible removal are hidden.
+
+Figure 5. Single-community trait associations: blue species persist above the cutoff, red species were removed. Extinct final biomass is displayed at a floor. K_R0 has no uptake effect for species forbidden from using R0. These plots are descriptive; food permissions and interactions can confound apparent trait effects.
+
+Figure 6. Accounting residuals and cumulative threshold extinctions. Energy-equivalent resources plus living biomass, accumulated mortality and cutoff losses remain equal to the initial total. The extinction curve records numerical cutoff crossings, not experimental viability measurements.
+
+Figure 7. Matched scenario comparisons over ten random communities. Each gray line connects conditions using one seed. Species counts and final Shannon need not move together: losing rare species may change richness more than Shannon. The structured condition changes several assumptions together. Lines summarize simulations, not biological confidence intervals.
