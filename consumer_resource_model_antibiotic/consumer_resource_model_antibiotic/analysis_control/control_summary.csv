@@ -1,0 +1,2 @@
+initial_antibiotic,antibiotic_decay,antibiotic_kmax,antibiotic_hill,resistance_cost_max,initial_resource,final_antibiotic,antibiotic_auc,final_biomass,living_energy_fraction,minimum_biomass,time_of_minimum_biomass,biomass_auc,survivors,final_shannon,initial_weighted_IC50,final_weighted_IC50,IC50_enrichment_ratio,cumulative_antibiotic_death_loss,max_budget_error
+0.0,0.02,0.2,2.0,0.2,1.0,0.0,0.0,1.0100000000000189,1.0000000000000187,0.01,0.0,291.99300583505953,25,2.0909079113531446,0.5033747205632121,0.2878904820210065,0.5719208181509269,0.0,1.9317880628477724e-14
