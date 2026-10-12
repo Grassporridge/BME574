@@ -118,20 +118,47 @@ def make_report(summary, sensitivity, diagnostics, report_path, assignments=None
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, PageBreak
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    # ReportLab's built-in Helvetica/Times fonts lack many Greek, subscript, and
+    # superscript glyphs used here. Embed Matplotlib's bundled DejaVu Sans so the
+    # PDF renders these characters consistently on systems without extra fonts.
+    font_dir = Path(matplotlib.get_data_path()) / "fonts" / "ttf"
+    pdfmetrics.registerFont(TTFont("ReportDejaVu", str(font_dir / "DejaVuSans.ttf")))
+    pdfmetrics.registerFont(TTFont("ReportDejaVu-Bold", str(font_dir / "DejaVuSans-Bold.ttf")))
+    pdfmetrics.registerFont(TTFont("ReportDejaVu-Oblique", str(font_dir / "DejaVuSans-Oblique.ttf")))
+    pdfmetrics.registerFont(TTFont("ReportDejaVu-BoldOblique", str(font_dir / "DejaVuSans-BoldOblique.ttf")))
+    pdfmetrics.registerFontFamily("ReportDejaVu", normal="ReportDejaVu", bold="ReportDejaVu-Bold",
+                                  italic="ReportDejaVu-Oblique", boldItalic="ReportDejaVu-BoldOblique")
 
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name="ReportTitle", parent=styles["Title"], alignment=TA_CENTER, fontSize=18, leading=22))
+    for style_name in ["Normal", "BodyText"]:
+        styles[style_name].fontName = "ReportDejaVu"
+    for style_name in ["Heading1", "Heading2", "Title"]:
+        styles[style_name].fontName = "ReportDejaVu-Bold"
+    styles.add(ParagraphStyle(name="ReportTableCell", parent=styles["BodyText"],
+                              fontName="ReportDejaVu", fontSize=7.5, leading=9))
+    styles.add(ParagraphStyle(name="ReportTableHeader", parent=styles["BodyText"],
+                              fontName="ReportDejaVu-Bold", fontSize=7.5, leading=9,
+                              textColor=colors.white))
+    styles.add(ParagraphStyle(name="ReportTitle", parent=styles["Title"], fontName="ReportDejaVu-Bold",
+                              alignment=TA_CENTER, fontSize=18, leading=22))
     doc = SimpleDocTemplate(str(report_path), pagesize=letter, rightMargin=0.65*inch,
                             leftMargin=0.65*inch, topMargin=0.55*inch, bottomMargin=0.55*inch)
     story = [Paragraph("Random diagonally stable gLV community with antibiotic exposure", styles["ReportTitle"]),
              Spacer(1, 10), Paragraph("Model equations and parameter meanings", styles["Heading1"]),
-             Paragraph("For species i=1,…,n, dXᵢ/dt = Xᵢ[rᵢ(1−cρᵢ)+ΣⱼAᵢⱼXⱼ−kₘₐₓA(t)ʰ/(IC₅₀ᵢʰ+A(t)ʰ)]. "
-                       "Xᵢ is abundance; rᵢ is intrinsic growth; Aᵢⱼ is the per-capita effect of species j on i; "
-                       "ρᵢ∈[0,1] is resistance; c is the maximum fractional growth cost at ρ=1; and the Hill term is direct antibiotic killing.", styles["BodyText"]),
-             Spacer(1, 5), Paragraph("dA/dt=−kdeg·A; A(0)=A₀. IC₅₀ᵢ=IC₅₀min(IC₅₀max/IC₅₀min)^ρᵢ. "
-                       "There is no explicit resource, β-lactamase, or inhibitor state. The ecological interaction matrix is randomly sampled, "
+             Paragraph("For species i=1,...,n:<br/><br/>"
+                       "dX<sub>i</sub>/dt = X<sub>i</sub> [ r<sub>i</sub>(1 - c rho<sub>i</sub>) + "
+                       "Σ<sub>j=1</sub><super>n</super> A<sub>ij</sub>X<sub>j</sub> - "
+                       "k<sub>max</sub>A(t)<super>h</super>/(IC50<sub>i</sub><super>h</super> + A(t)<super>h</super>) ].<br/><br/>"
+                       "X<sub>i</sub> is abundance; r<sub>i</sub> is intrinsic growth; A<sub>ij</sub> is the per-capita effect of species j on i; "
+                       "rho<sub>i</sub> in [0,1] is resistance; c is the maximum fractional growth cost at rho=1; and the Hill term is direct antibiotic killing.", styles["BodyText"]),
+             Spacer(1, 5), Paragraph("Antibiotic dynamics: dA/dt = -k<sub>deg</sub>A; A(0)=A<sub>0</sub>.<br/>"
+                       "Resistance mapping: IC50<sub>i</sub> = IC50<sub>min</sub>(IC50<sub>max</sub>/IC50<sub>min</sub>)<super>rho<sub>i</sub></super>.<br/><br/>"
+                       "There is no explicit resource, beta-lactamase, or inhibitor state. The ecological interaction matrix is randomly sampled, "
                        "then constructed as A=W⁻¹(K−P), with W diagonal positive, K skew-symmetric, and P symmetric positive definite. "
-                       "Thus WA+AᵀW=−2P≺0, certifying diagonal stability. A positive target equilibrium x* is sampled and r=−Ax*, "
+                       "Thus WA+A^T W = -2P is negative definite, certifying diagonal stability. A positive target equilibrium x* is sampled and r=-Ax*, "
                        "so the no-drug, zero-cost system has a feasible equilibrium by construction.", styles["BodyText"]),
              Spacer(1, 7), Paragraph("What was run", styles["Heading1"]),
              Paragraph("Matched no-drug controls; antibiotic dose and decay sweeps; species-level resistance selection relative to matched control; "
@@ -152,12 +179,15 @@ def make_report(summary, sensitivity, diagnostics, report_path, assignments=None
         ["Initial biomass", "0.0025, 0.01, 0.04, 0.16", "Density-dependent gLV context (CRM resource analog)"],
         ["Sensitivity screen", "40 draws; kmax 0.15–0.8; h 1–4", "Exploratory Spearman screen; other ranges listed above"],
     ]
+    range_rows = [[Paragraph(str(cell), styles["ReportTableHeader"] if i == 0 else styles["ReportTableCell"])
+                   for cell in row] for i, row in enumerate(range_rows)]
     range_table = Table(range_rows, colWidths=[1.05*inch, 1.9*inch, 4.05*inch], repeatRows=1)
     range_table.setStyle(TableStyle([("BACKGROUND", (0,0),(-1,0), colors.HexColor("#243b53")),
                                      ("TEXTCOLOR", (0,0),(-1,0), colors.white),
                                      ("GRID", (0,0),(-1,-1), .3, colors.grey),
                                      ("VALIGN", (0,0),(-1,-1), "TOP"),
-                                     ("FONTSIZE", (0,0),(-1,-1), 7.5),
+                                     ("FONTSIZE", (0,0),(-1,-1), 7.5), ("FONTNAME", (0,0),(-1,-1), "ReportDejaVu"),
+                                     ("FONTNAME", (0,0),(-1,0), "ReportDejaVu-Bold"),
                                      ("ROWBACKGROUNDS", (0,1),(-1,-1), [colors.white, colors.HexColor("#eef3f8")])]))
     story.append(range_table)
     key = summary[summary.scenario.isin(["control", "dose=1", "dose=2", "decay=0", "decay=0.1"])][
@@ -168,7 +198,9 @@ def make_report(summary, sensitivity, diagnostics, report_path, assignments=None
         tab.setStyle(TableStyle([("BACKGROUND", (0,0),(-1,0), colors.HexColor("#243b53")),
                                  ("TEXTCOLOR", (0,0),(-1,0), colors.white),
                                  ("GRID", (0,0),(-1,-1), .35, colors.grey),
-                                 ("FONTSIZE", (0,0),(-1,-1), 8), ("ROWBACKGROUNDS", (0,1),(-1,-1), [colors.white, colors.HexColor("#eef3f8")])]))
+                                 ("FONTSIZE", (0,0),(-1,-1), 8), ("FONTNAME", (0,0),(-1,-1), "ReportDejaVu"),
+                                 ("FONTNAME", (0,0),(-1,0), "ReportDejaVu-Bold"),
+                                 ("ROWBACKGROUNDS", (0,1),(-1,-1), [colors.white, colors.HexColor("#eef3f8")])]))
         story.extend([Spacer(1, 7), tab])
     dose_rows = summary[summary.scenario.isin(["control", "dose=2"])].drop_duplicates("scenario").set_index("scenario")
     if "control" in dose_rows.index and "dose=2" in dose_rows.index:
