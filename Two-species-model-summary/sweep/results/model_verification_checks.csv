@@ -1,0 +1,35 @@
+check,value,limit,pass
+1. rhs vs SI transcription (max relative difference),1.2659927285986558e-15,1e-12,True
+2. Fig. 2C: |S(20) - 2.2| read off the figure,0.025381560499881495,0.15,True
+2. Fig. 2C: |R(20) - 1.7| read off the figure,0.0423196777733017,0.15,True
+2. Fig. 2C inset: |f_R(20) - 0.43|,0.0025550864619320324,0.03,True
+"3. Fig. 2D: A=100, I=0.32 ends majority resistant",0.1392348977095026,0.5,True
+"3. Fig. 2D: A=6.8, I=10 ends majority sensitive",0.16162796467768284,0.5,True
+"3. Fig. 2D: A=100, I=0.32 lowest density within 10x of 1e-3",0.21124433928188063,1.0,True
+"3. Fig. 2D: A=6.8, I=10 lowest density within 10x of 1e-6",0.3856176716356357,1.0,True
+3. Fig. 3A: 'Higher burden (α = 0.8)' lowers the resistant fraction at almost all doses (share going the other way),0.0,0.1,True
+3. Fig. 3A: 'Higher Bla inhibition (c = 0.9)' lowers the resistant fraction at almost all doses (share going the other way),0.0,0.1,True
+3. Fig. 3A: 'Higher private benefit (β_min = 0.7)' raises the resistant fraction at almost all doses (share going the other way),0.016,0.1,True
+4. engine vs reference model (worst normalised difference),0.014540726308652182,1.0,True
+5. solver independence: final densities (max relative difference),3.9297359397659576e-07,0.0001,True
+5. solver independence: lowest S (max log10 difference),7.763657095204415e-08,0.01,True
+6. mass balance residual (40 random runs),7.114209976677444e-07,0.0001,True
+6. enzyme balance residual,3.3322005481319084e-06,0.0001,True
+6. antibiotic never increases (largest step up),6.177209033409653e-12,1e-09,True
+6. most negative state value (magnitude),3.614105171259693e-10,1e-08,True
+6. nutrient + biomass never increases (largest step up),7.297709103681882e-10,1e-08,True
+7. no drug: |final total - 4.4|,1.9815768581565862e-07,1e-05,True
+7. no drug: ln(nr/nr0) - alpha ln(ns/ns0),0.0,1e-08,True
+7. identical strains: max |ln(nr/ns)| at any time,0.0,1e-08,True
+"7. i = 0: independent of c, h_i, d_b (final S, R difference)",0.0,1e-08,True
+"7. same iota from different (i, h_i): final S, R difference",2.5934809855243657e-13,1e-08,True
+7. no S loss just below the killing threshold,0.0,1e-12,True
+7. S loss just above the killing threshold,0.0,0.0,True
+"7. Eq. 1 vs sign of d ln(nr/ns)/dt (mismatches in 3,000 random states)",0.0,0.0,True
+8. horizon: final f_R unchanged when run twice as long,6.41580122362484e-11,0.0001,True
+8. horizon: final total unchanged (relative),2.656881519997133e-07,0.0001,True
+8. sampling: peak S loss error,1.0141998352253268e-11,0.01,True
+8. sampling: S recovery time error (time units),0.5999999999999943,2.0,True
+8. sampling: time-to-steady-state error (time units),0.8599999999999852,2.0,True
+9b. never-cleared antibiotic is labelled collapsed,0.0,0.0,True
+9d. no drug: recovery time is zero,0.0,0.0,True
