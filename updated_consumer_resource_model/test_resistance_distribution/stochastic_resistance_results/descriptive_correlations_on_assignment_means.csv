@@ -1,0 +1,7 @@
+hour,metric,spearman_rho,assignment_cells
+6.0,retention_mean,0.9143651014170605,60
+6.0,bc_mean,-0.7927202000555712,60
+24.0,retention_mean,0.9108641289247014,60
+24.0,bc_mean,-0.9369269241455961,60
+48.0,retention_mean,0.6905251458738539,60
+48.0,bc_mean,-0.8135037510419564,60

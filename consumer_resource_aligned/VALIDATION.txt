@@ -1,0 +1,7 @@
+Validation against uploaded antibiotic model snapshot
+
+- Exact community-trait equality at seed 42 and 43 for default, fixed-affinity/no-cost, and structured settings.
+- All six A=0 trajectory comparisons passed; maximum biomass difference was 2.1e-9. Removing the constant-zero drug state changes adaptive integration steps slightly.
+- Capacity normalization, balanced categories, zero mortality/no-food behavior, energy accounting, and Shannon checks passed.
+- CLI scenario workflow, two replicate seeds, and all 13 initial-composition conditions ran successfully.
+- Notebook analysis cells executed with ten repeated seeds and all 13 composition conditions; image display helpers were substituted because IPython was unavailable in the validation environment.
