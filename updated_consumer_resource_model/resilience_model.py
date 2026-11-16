@@ -66,6 +66,8 @@ class Params:
     n_resistant: int = 1            # how many strains carry the gene; 0 = sensitive community
     focal_multiplier: float = 1.0   # starting biomass of k30 relative to the others (1x or 10x)
     resistance_cost: float = 0.05   # fractional loss of maximum growth rate for a carrier
+    carrier_lysis: float = 0.0      # carrier killing as a fraction of a susceptible cell's
+                                    # (Ma et al.'s beta): 0 = immune, 1 = no private protection
 
     # --- antibiotic ------------------------------------------------------------
     dose: float = 50.0              # ug/ml carbenicillin added at the start of treatment
@@ -75,10 +77,16 @@ class Params:
     ic50_cv: float = 0.70           # strain-to-strain spread in IC50 (lognormal sd)
     vmax: float = 10000.0           # ug/ml/h per OD of resistant biomass, at saturation
     km: float = 5.3                 # ug/ml; TEM-1 Km for carbenicillin (14 uM)
+    free_enzyme_activity: float = 0.35  # activity of enzyme released by lysed carriers, per OD
+                                        # lysed, relative to vmax (Ma et al.'s kappa_b/phi_max)
+    enzyme_decay: float = 0.0       # 1/h, inactivation of free enzyme (Ma et al.: none without
+                                    # inhibitor)
 
     # --- protocol --------------------------------------------------------------
     initial_biomass: float = 0.005  # total OD at inoculation, split equally across strains
     pregrowth_h: float = 4.0        # drug-free growth before treatment
+    lag_h: float = 0.0              # lag after inoculation and after transfer into fresh
+                                    # medium (Baranyi-Roberts); 0 = no lag
     treatment_h: float = 20.0       # with drug
     dilution: float = 100.0         # fold dilution at transfer into fresh medium
     recovery_h: float = 24.0        # drug-free growth after transfer
@@ -148,34 +156,55 @@ def community(p: Params):
 
 
 # --------------------------------------------------------------------------- dynamics
-def _rates(N, R, a, mu, ic50, carrier, p: Params):
-    """Per-strain growth and killing, nutrient draw-down, and drug degradation."""
+def _lag_factor(t: float, t_fresh: float, p: Params) -> float:
+    """Fraction of full growth capacity, t hours after entering fresh medium at t_fresh.
+
+    Baranyi-Roberts adjustment alpha = q/(1+q) with dq/dt = growth_mean * q, written in
+    closed form. q(t_fresh) is set so that log biomass lags its unlagged course by `lag_h`
+    hours. With lag_h = 0 the factor is exactly 1 and the model is unchanged.
+    """
+    if p.lag_h <= 0.0:
+        return 1.0
+    q0_inv = np.expm1(p.growth_mean * p.lag_h)          # 1/q0 = exp(mu*lag) - 1
+    return 1.0 / (1.0 + q0_inv * np.exp(-p.growth_mean * (t - t_fresh)))
+
+
+def _rates(N, R, a, mu, ic50, carrier, p: Params, E: float = 0.0, lag: float = 1.0):
+    """Per-strain growth and killing, nutrient draw-down, drug degradation, free enzyme.
+
+    `E` is free enzyme released by lysed carriers, in OD of lysed carrier biomass; `lag` is
+    the lag-phase growth factor from `_lag_factor`.
+    """
     R = max(R, 0.0)
     a = max(a, 0.0)
-    g = mu * R / (p.half_saturation + R)              # Monod growth on the shared nutrient
+    E = max(E, 0.0)
+    g = lag * mu * R / (p.half_saturation + R)        # Monod growth, slowed during lag
     if a > 0.0:
         x = (a / ic50) ** p.hill
         kill = p.gamma * (x / (1.0 + x)) * g          # beta-lactam killing needs growth
-        kill = np.where(carrier, 0.0, kill)           # carriers are immune at these doses
+        kill = np.where(carrier, p.carrier_lysis * kill, kill)   # 0 = immune carriers
     else:
         kill = np.zeros_like(g)
     dR = -float(np.sum(N * g))                        # 1 OD of biomass consumes 1 unit of food
     resistant_biomass = float(np.sum(N[carrier]))
-    da = -p.vmax * resistant_biomass * a / (p.km + a) # saturating degradation by live carriers
-    return g, kill, dR, da
+    enzyme = resistant_biomass + p.free_enzyme_activity * E
+    da = -p.vmax * enzyme * a / (p.km + a)            # saturating degradation, cells + free
+    dE = float(np.sum((N * kill)[carrier])) - p.enzyme_decay * E   # released on lysis
+    return g, kill, dR, da, dE
 
 
-def _segment(N0, R0, a0, t0, t1, mu, ic50, carrier, p: Params, alive):
+def _segment(N0, R0, a0, E0, t0, t1, t_fresh, mu, ic50, carrier, p: Params, alive):
     """Integrate one phase, stopping whenever a strain crosses the one-cell floor.
 
     Biomass is integrated in log space so that abundances spanning many orders of
     magnitude stay accurate; a strain that reaches one cell is removed for good.
+    `t_fresh` is when the culture last entered fresh medium, which sets the lag phase.
     """
     floor_log = np.log(p.floor)
     grid_t = np.arange(t0, t1 + p.dt_out / 2, p.dt_out)
-    ts, Ns, Rs, as_, deaths = [], [], [], [], []
+    ts, Ns, Rs, as_, Es, deaths = [], [], [], [], [], []
     death_total = 0.0
-    N, R, a = N0.copy(), R0, a0
+    N, R, a, E = N0.copy(), R0, a0, E0
 
     while t0 < t1 - 1e-12:
         idx = np.flatnonzero(alive)
@@ -183,16 +212,17 @@ def _segment(N0, R0, a0, t0, t1, mu, ic50, carrier, p: Params, alive):
             te = grid_t[(grid_t >= t0) & (grid_t <= t1)]
             for t in te:
                 ts.append(t); Ns.append(N.copy()); Rs.append(R); as_.append(a)
-                deaths.append(death_total)
+                Es.append(E); deaths.append(death_total)
             break
 
         def rhs(t, y):
             Nl = np.zeros_like(N)
             Nl[idx] = np.exp(y[:idx.size])
-            g, kill, dR, da = _rates(Nl, y[-3], y[-2], mu, ic50, carrier, p)
+            g, kill, dR, da, dE = _rates(Nl, y[-4], y[-3], mu, ic50, carrier, p,
+                                         E=y[-2], lag=_lag_factor(t, t_fresh, p))
             dlog = g[idx] - p.death_rate - kill[idx]
             dloss = float(np.sum(Nl * (p.death_rate + kill)))
-            return np.r_[dlog, dR, da, dloss]
+            return np.r_[dlog, dR, da, dE, dloss]
 
         def make_event(j):
             def ev(t, y):
@@ -201,7 +231,7 @@ def _segment(N0, R0, a0, t0, t1, mu, ic50, carrier, p: Params, alive):
             ev.direction = -1
             return ev
 
-        y0 = np.r_[np.log(np.maximum(N[idx], p.floor * 1e-3)), R, a, death_total]
+        y0 = np.r_[np.log(np.maximum(N[idx], p.floor * 1e-3)), R, a, E, death_total]
         te = np.minimum(grid_t[(grid_t >= t0) & (grid_t <= t1)], t1)
         sol = solve_ivp(rhs, (t0, t1), y0, method="LSODA", t_eval=te,
                         events=[make_event(j) for j in range(idx.size)],
@@ -212,14 +242,16 @@ def _segment(N0, R0, a0, t0, t1, mu, ic50, carrier, p: Params, alive):
         for k, t in enumerate(sol.t):
             Nk = np.zeros_like(N)
             Nk[idx] = np.exp(sol.y[:idx.size, k])
-            ts.append(float(t)); Ns.append(Nk); Rs.append(float(sol.y[-3, k]))
-            as_.append(float(sol.y[-2, k])); deaths.append(float(sol.y[-1, k]))
+            ts.append(float(t)); Ns.append(Nk); Rs.append(float(sol.y[-4, k]))
+            as_.append(float(sol.y[-3, k])); Es.append(float(sol.y[-2, k]))
+            deaths.append(float(sol.y[-1, k]))
 
         if sol.status == 1:                                  # a strain hit the floor
             t0 = float(sol.t_events[[len(e) > 0 for e in sol.t_events].index(True)][0])
             yend = np.concatenate([e for e in sol.y_events if len(e)])[0]
             N = np.zeros_like(N); N[idx] = np.exp(yend[:idx.size])
-            R, a, death_total = float(yend[-3]), float(yend[-2]), float(yend[-1])
+            R, a, E = float(yend[-4]), float(yend[-3]), float(yend[-2])
+            death_total = float(yend[-1])
             hit = idx[np.isclose(yend[:idx.size], floor_log, atol=1e-9)]
             if hit.size == 0:
                 hit = idx[[int(np.argmin(yend[:idx.size]))]]
@@ -229,10 +261,10 @@ def _segment(N0, R0, a0, t0, t1, mu, ic50, carrier, p: Params, alive):
         else:
             t0 = t1
             N = Ns[-1].copy() if Ns else N
-            R, a, death_total = Rs[-1], as_[-1], deaths[-1]
+            R, a, E, death_total = Rs[-1], as_[-1], Es[-1], deaths[-1]
 
-    return (np.array(ts), np.array(Ns), np.array(Rs), np.array(as_),
-            np.array(deaths), N, R, a, death_total)
+    return (np.array(ts), np.array(Ns), np.array(Rs), np.array(as_), np.array(Es),
+            np.array(deaths), N, R, a, E, death_total)
 
 
 def simulate(p: Params) -> dict:
@@ -243,19 +275,20 @@ def simulate(p: Params) -> dict:
     t_transfer = p.pregrowth_h + p.treatment_h
     t_end = t_transfer + p.recovery_h
 
-    T, NN, RR, AA, DD = [], [], [], [], []
+    T, NN, RR, AA, EE, DD = [], [], [], [], [], []
     removed = 0.0
 
-    # phase 1: drug-free pre-growth
-    ts, Ns, Rs, as_, dd, N, R, a, death = _segment(
-        n0, p.food, 0.0, 0.0, t_treat, mu, ic50, carrier, p, alive)
-    T += list(ts); NN += list(Ns); RR += list(Rs); AA += list(as_); DD += list(dd)
+    # phase 1: drug-free pre-growth, from inoculation into fresh medium at t = 0
+    ts, Ns, Rs, as_, es, dd, N, R, a, E, death = _segment(
+        n0, p.food, 0.0, 0.0, 0.0, t_treat, 0.0, mu, ic50, carrier, p, alive)
+    T += list(ts); NN += list(Ns); RR += list(Rs); AA += list(as_); EE += list(es)
+    DD += list(dd)
 
-    # phase 2: drug added
+    # phase 2: drug added to the same culture (no new lag)
     a = p.dose
-    ts, Ns, Rs, as_, dd, N, R, a, death2 = _segment(
-        N, R, a, t_treat, t_transfer, mu, ic50, carrier, p, alive)
-    T += list(ts); NN += list(Ns); RR += list(Rs); AA += list(as_)
+    ts, Ns, Rs, as_, es, dd, N, R, a, E, death2 = _segment(
+        N, R, a, E, t_treat, t_transfer, 0.0, mu, ic50, carrier, p, alive)
+    T += list(ts); NN += list(Ns); RR += list(Rs); AA += list(as_); EE += list(es)
     DD += list(np.asarray(dd) + death)
     death += death2
 
@@ -263,6 +296,7 @@ def simulate(p: Params) -> dict:
     pre_transfer = N.copy()
     removed += R          # the spent medium, with whatever nutrient is left in it, is discarded
     N = N / p.dilution
+    E = E / p.dilution    # free enzyme is carried over in the transferred volume
     removed += float(np.sum(pre_transfer) - np.sum(N))
     gone = (N < p.floor) & alive
     removed += float(np.sum(N[gone]))
@@ -270,10 +304,10 @@ def simulate(p: Params) -> dict:
     alive = alive & ~gone
     post_transfer = N.copy()
 
-    # phase 3: recovery in fresh medium
-    ts, Ns, Rs, as_, dd, N, R, a, death3 = _segment(
-        N, p.food, 0.0, t_transfer, t_end, mu, ic50, carrier, p, alive)
-    T += list(ts); NN += list(Ns); RR += list(Rs); AA += list(as_)
+    # phase 3: recovery in fresh medium, with a new lag from the transfer
+    ts, Ns, Rs, as_, es, dd, N, R, a, E, death3 = _segment(
+        N, p.food, 0.0, E, t_transfer, t_end, t_transfer, mu, ic50, carrier, p, alive)
+    T += list(ts); NN += list(Ns); RR += list(Rs); AA += list(as_); EE += list(es)
     DD += list(np.asarray(dd) + death)
     death += death3
 
@@ -283,7 +317,7 @@ def simulate(p: Params) -> dict:
     standing = float(np.sum(NN[-1])) + float(RR[-1])
     budget_error = standing + death + removed - supplied
 
-    return dict(params=p, t=T, N=NN, R=np.array(RR), a=np.array(AA),
+    return dict(params=p, t=T, N=NN, R=np.array(RR), a=np.array(AA), E=np.array(EE),
                 carrier=carrier, mu=mu, ic50=ic50, t_transfer=t_transfer,
                 pre_transfer=pre_transfer, post_transfer=post_transfer,
                 budget_error=budget_error)
@@ -360,6 +394,22 @@ def _metrics(runs, p: Params) -> pd.Series:
     def ratio(num, den):
         return float(num / den) if den > 0 else np.nan
 
+    # drug clearance: hours from drug addition until the drug first falls below the median
+    # susceptible IC50 (where killing of a typical strain is at half its maximum)
+    trt = runs[("resistant", True)]
+    # the treatment phase starts at the first stored point carrying drug; the point stored
+    # at the same time just before it is the end of drug-free pre-growth
+    start = int(np.argmax((trt["t"] >= p.pregrowth_h - 1e-9) & (trt["a"] > 0)))
+    stop = int(np.argmax(trt["t"] >= trt["t_transfer"] - 1e-9))     # end of treatment
+    below = np.flatnonzero(trt["a"][start:stop + 1] < p.susceptible_ic50)
+    clearance = (float(trt["t"][start + below[0]] - p.pregrowth_h)
+                 if p.dose > p.susceptible_ic50 and below.size else np.nan)
+    i24 = int(np.argmin(np.abs(trt["t"] - 24.0)))
+    carriers_24 = snapshot(trt, 24.0)[carrier].sum()
+    # early response of the non-carrier members, as in the lab's 4 h -> 6 h biomass panel;
+    # 4 h is the last drug-free point, so this is the first two hours of treatment
+    early = ratio(snapshot(trt, 6.0)[prot].sum(), snapshot(trt, 4.0)[prot].sum())
+
     return pd.Series(dict(
         # --- manuscript readouts, whole community --------------------------------
         biomass_treated=float(xt.sum()), biomass_control=float(xc.sum()),
@@ -378,13 +428,20 @@ def _metrics(runs, p: Params) -> pd.Series:
         protected_shannon_ratio=ratio(shannon(xt[prot]), shannon(xc[prot])),
         protected_richness=richness(xt[prot]), protected_richness_control=richness(xc[prot]),
         protected_biomass_ratio=ratio(xt[prot].sum(), xc[prot].sum()),
+        protected_change_4_6h=early,
+        # truly gone (below one cell), as opposed to merely below the detection limit
+        protected_extinct=int((snapshot(runs[("resistant", True)], 48.0)[prot] <= 0).sum()),
         # --- the matched all-sensitive community ---------------------------------
         sensitive_biomass_resilience=ratio(st.sum(), sc.sum()),
         sensitive_shannon_treated=shannon(st), sensitive_shannon_control=shannon(sc),
         sensitive_richness_treated=richness(st),
+        # --- mechanism -----------------------------------------------------------
+        drug_clearance_h=clearance,
+        free_enzyme_at_24h=float(trt["E"][i24]),
+        carrier_biomass_24h=float(carriers_24),
+        carrier_survived=bool((detected(snapshot(trt, 48.0), p)[carrier] > 0).any()),
         # --- diagnostics ---------------------------------------------------------
-        drug_at_24h=float(runs[("resistant", True)]["a"][
-            int(np.argmin(np.abs(runs[("resistant", True)]["t"] - 24.0)))]),
+        drug_at_24h=float(trt["a"][i24]),
         budget_error=max(abs(r["budget_error"]) for r in runs.values()),
     ))
 
@@ -521,6 +578,10 @@ TESTED_RANGES = {
     "km": (0.5, 50.0),
     "initial_biomass": (1e-4, 0.05),
     "dilution": (10.0, 1000.0),
+    "carrier_lysis": (0.0, 1.0),
+    "free_enzyme_activity": (0.0, 10.0),
+    "enzyme_decay": (0.0, 2.0),
+    "lag_h": (0.0, 4.0),
 }
 
 
@@ -652,6 +713,59 @@ def check(verbose: bool = True) -> pd.DataFrame:
                  run(seed=s, vmax=0.0).metrics.protected_shannon_ratio for s in (1, 7, 42, 99)]
     add("Degradation helps the susceptible members for every seed tested",
         all(direction), f"{sum(direction)}/4 seeds")
+
+    # 16. a carrier stripped of immunity, degradation, release and cost is just another
+    # susceptible strain, so the resistant community must match the all-sensitive one
+    plain = run(carrier_lysis=1.0, vmax=0.0, free_enzyme_activity=0.0, resistance_cost=0.0)
+    a1 = snapshot(plain.runs[("resistant", True)], 48.0)
+    a2 = snapshot(plain.runs[("sensitive", True)], 48.0)
+    a1_24 = snapshot(plain.runs[("resistant", True)], 24.0)
+    a2_24 = snapshot(plain.runs[("sensitive", True)], 24.0)
+    d = float(np.max(np.abs(a1_24 - a2_24)) / max(a2_24.max(), 1e-300))
+    add("A carrier with no immunity, degradation, release or cost is an ordinary strain",
+        d < 1e-6 and np.array_equal(a1 > 0, a2 > 0),
+        f"max relative difference at 24 h = {d:.1e}")
+
+    # 17. free enzyme exists only when carriers can be lysed
+    e_base = max(float(r["E"].max()) for r in base.runs.values())
+    lysed = run(carrier_lysis=1.0)
+    e_lys = float(lysed.treated["E"].max())
+    no_rel = run(carrier_lysis=1.0, free_enzyme_activity=0.0)
+    add("Free enzyme appears only when carriers are lysed, and only it can help then",
+        e_base == 0.0 and e_lys > 0.0 and
+        lysed.metrics.protected_richness >= no_rel.metrics.protected_richness,
+        f"max free enzyme: immune carriers {e_base:.1e}, lysed carriers {e_lys:.1e} OD; "
+        f"susceptible survivors with/without release {lysed.metrics.protected_richness:.0f}/"
+        f"{no_rel.metrics.protected_richness:.0f}")
+
+    # 18. losing private protection costs the carrier: monotone in carrier_lysis
+    cb = [run(carrier_lysis=b).metrics.carrier_biomass_24h for b in (0.0, 0.3, 0.6, 0.9)]
+    add("The less private protection, the less carrier biomass at 24 h",
+        all(x >= y for x, y in zip(cb, cb[1:])),
+        "carrier OD at 24 h for carrier_lysis 0, 0.3, 0.6, 0.9: " +
+        ", ".join(f"{x:.2g}" for x in cb))
+
+    # 19. lag follows the Baranyi-Roberts curve: while nutrient is plentiful, the log-biomass
+    # deficit at time t is -ln[exp(-mu t)(1 - exp(-mu L)) + exp(-mu L)], which tends to mu L
+    lag, t4, mu_ = 1.0, 4.0, BASELINE.growth_mean
+    n_nolag = snapshot(run(dose=0.0).control, t4).sum()
+    n_lag = snapshot(run(dose=0.0, lag_h=lag).control, t4).sum()
+    expected = -np.log(np.exp(-mu_ * t4) * -np.expm1(-mu_ * lag) + np.exp(-mu_ * lag))
+    shift = np.log(n_nolag / n_lag) / expected
+    add("Lag follows the Baranyi-Roberts curve",
+        0.9 < shift < 1.1,
+        f"log-biomass deficit at 4 h for a 1 h lag = {shift:.3f} x the Baranyi prediction "
+        f"(strains' growth rates differ from the mean, so not exactly 1)")
+
+    # 20. cells in lag are drug-tolerant, because killing needs growth
+    def early_survival(lag_h):
+        s = run(pregrowth_h=0.5, lag_h=lag_h, vmax=0.0).runs
+        return snapshot(s[("sensitive", True)], 2.5).sum() / \
+            snapshot(s[("sensitive", False)], 2.5).sum()
+    s0, s3 = early_survival(0.0), early_survival(3.0)
+    add("Cells still in lag when the drug arrives are killed less",
+        s3 > s0, f"treated/untreated biomass 2 h into treatment: no lag {s0:.3f}, "
+        f"3 h lag {s3:.3f}")
 
     df = pd.DataFrame(rows)
     if verbose:

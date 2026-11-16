@@ -127,75 +127,114 @@ Default initial conditions are:
 nₛ(0) = 0.2,  nᵣ(0) = 0.2,  s(0) = 4,  b(0) = 0,  a(0) = a₀
 ~~~
 
-## Person 1–Person 4 task schema
+## Project status
 
-The four workstreams share the same base model and endpoints. Each person owns the primary
-parameters below while initially holding the other parameter blocks at their shared baseline.
+The Person 1–Person 4 sweeps of the two-population model are complete; the notebooks, tables and
+reports are in [Two-species-model-summary/](Two-species-model-summary/) (notebooks 02–05 cover the
+four parameter blocks, and notebook 06 checks the paper's selection criterion). The gLV model in
+'glv_antibiotic/' has been dropped.
 
-### Person 1 — resistance and selection parameters
+Work now continues in the 57-strain consumer-resource model of the barcoded *E. coli*
+cross-protection experiment:
+[updated_consumer_resource_model/resilience_model.py](updated_consumer_resource_model/resilience_model.py).
+Its equations, assumptions, parameters and readouts are documented in that folder's README.
+A summary of all analyses so far, with what they cover and what is still open, is in
+[updated_consumer_resource_model/FINDINGS_SUMMARY.md](updated_consumer_resource_model/FINDINGS_SUMMARY.md)
+(also as PDF).
 
-**Parameters:** 'alpha', 'beta_min', 'c'
+## Possible tests: consumer-resource model
 
-**Purpose:** test the Ma selection criterion and determine how resistance burden, private benefit,
-and inhibitor efficacy change selection for susceptible versus resistant cells.
+**Ready** means the test runs through 'sweep()' or 'grid()' with existing parameters; **small
+change** or **larger change** means code is needed first. The example notebook already contains a
+rough 'n_resistant' sweep (at 'gamma=4', 'vmax=3000'), single sweeps of 'dose', 'growth_mean' and
+'gamma', and a 'gamma' × 'vmax' grid; the tests below extend those rather than repeat them.
 
-**Core tasks:**
+### Community makeup
 
-- sweep the three criterion parameters over the supplementary-information ranges;
-- compare dynamic outcomes with the general and simplified selection criteria;
-- quantify final resistant fraction, diversity, population survival, extinction, recovery, and
-  bottleneck depth;
-- identify parameter regions that favor susceptible cells, resistant cells, or coexistence;
-- document criterion agreement and mismatches.
+- [x] **Number of resistant strains:** 'n_resistant' 1 → 56 at several doses. How many carriers are
+  needed to protect the rest, and is there a threshold? *Done at 50 µg/ml (Kylie): 0, 1, 5, 10, 20,
+  30, 40, 57 carriers × 10 carrier orders, deterministic and stochastic; see
+  'updated_consumer_resource_model/test_resistance_distribution/'. Other doses not yet run.*
+- [ ] **Number vs. biomass of resistance:** the same total carrier biomass as one strain at 8×
+  ('focal_multiplier') or eight strains at 1×. Does protection depend only on resistant biomass?
+  *Ready.*
+- [ ] **Starting resistant fraction:** 'focal_multiplier' 1 → 30 (k30 at 1.75% → 35%). Earlier
+  detoxification versus k30 takeover. *Ready.*
+- [ ] **Which strain carries resistance:** make the carrier the fastest, median or slowest grower.
+  Does a fast carrier protect better but take over more? *Small change. Partly covered: random
+  carrier identities in 'test_resistance_distribution/' (Kylie); the non-immune carrier's rescue
+  tracks k30's growth rate across trait draws in 'test_protection_mechanism/' §7.*
+- [ ] **Community size:** 'n_strains' 5, 10, 57, 200 at a fixed resistant fraction. *Ready (keep
+  'focal_index' < 'n_strains').*
+- [ ] **Trait heterogeneity:** 'growth_cv', 'ic50_cv'. Does more spread give graded strain loss
+  instead of all-or-nothing outcomes? *Ready.*
+- [ ] **Growth–sensitivity correlation:** draw IC50 correlated or anti-correlated with growth rate.
+  *Small change.*
+- [ ] **Robustness across trait draws:** 20+ values of 'seed'. *Ready. Partly covered: 12 seeds
+  for the protection and medium-ablation scenarios; 'test_resistance_distribution/' uses seed 42
+  only.*
 
-### Person 2 — antibiotic pharmacodynamics
+### Resistance traits
 
-**Parameters:** 'gamma', 'h_a', 'a0'
+- [ ] **Cost of resistance:** 'resistance_cost' 0 → 0.5. *Ready.*
+- [ ] **Detoxification strength:** 'vmax', 'km'. How much drug-removal capacity does recovery need?
+  *Ready. Partly covered: 'vmax' × 'carrier_lysis' in 'test_protection_mechanism/' §3, with a
+  kinetic ceiling of ≈ 3e4 µg/ml/h/OD (the default 1e4 is at the ceiling). 'km' not swept.*
+- [x] **Private vs. public benefit:** carrier immune only ('vmax=0'), degrades drug only (not
+  immune), or both. *Done: new 'carrier_lysis' and released-enzyme terms (Ma et al.'s β and free
+  Bla); see 'updated_consumer_resource_model/test_protection_mechanism/'.*
+- [ ] **Partial resistance:** carriers with a finite IC50 instead of full immunity. *Small change.
+  Partly covered: 'carrier_lysis' between 0 and 1 gives partial protection as a constant fraction
+  (Ma et al.'s β), not as a shifted IC50.*
 
-**Purpose:** determine how strongly and how steeply the antibiotic produces lysis.
+### Drug and treatment protocol
 
-**Core tasks:**
+- [ ] **Dose response:** 'dose' 5 → 500, including 50 vs. 70 µg/ml. Locate the transitions between
+  full recovery, partial strain loss and collapse. *Ready.*
+- [ ] **Growth phase at drug addition:** 'pregrowth_h' 0 → 8. Exponential vs. near-stationary
+  treatment. *Ready.*
+- [ ] **Treatment length and transfer timing:** 'treatment_h'. Is the drug cleared before the 1:100
+  transfer? *Ready.*
+- [ ] **Killing shape:** 'gamma', 'hill'. *Ready.*
+- [ ] **Repeated treatment cycles:** several treat → transfer cycles. Does strain loss accumulate?
+  *Small change.*
+- [ ] **β-lactamase inhibitor (clavulanate).** *Larger change.*
 
-- sweep maximum lysis coefficient, antibiotic Hill coefficient, and antibiotic dose;
-- distinguish dose effects from lysis-shape effects;
-- generate antibiotic-response maps and representative time courses;
-- provide common antibiotic settings for the other workstreams;
-- report total biomass loss, final composition, peak bottleneck, recovery, and time to steady state.
+### Environment (M9CA vs. LB)
 
-### Person 3 — inhibitor pharmacodynamics
+- [x] **Growth rate × food:** 'grid("growth_mean", …, "food", …)', separating the two differences
+  the LB preset changes together. *Done in 'test_medium_ablation/' (sections 1 and 4).*
+- [ ] **Inoculum density:** 'initial_biomass', which sets the density at drug addition. *Ready.*
+- [x] **Lag phase:** a new 'lag_h' parameter, the realistic version of the inoculum test.
+  *Done: Baranyi–Roberts lag after inoculation and transfer.*
+- [x] **Medium ablation:** switch growth, food, 'gamma', 'vmax' and lag one at a time from M9CA
+  toward LB. Which difference causes LB's strain loss? *Done: one at a time, pairwise, and a full
+  2⁵ factorial with Shapley attribution; see 'updated_consumer_resource_model/test_medium_ablation/'.*
+- [ ] **Transfer bottleneck:** 'dilution' 10 → 1000. How much loss happens at the transfer?
+  *Ready.*
+- [ ] **Starvation death:** 'death_rate'. *Ready.*
 
-**Parameters:** 'h_i', 'i', 'd_b'
+### Measurement and readouts
 
-**Purpose:** determine how inhibitor dose, inhibitor response steepness, and free-Bla inactivation
-alter private protection and public antibiotic degradation.
+- [ ] **Detection limit:** 'detection_rel' 1e-5 → 1e-3. *Ready.*
+- [ ] **Readout time:** 24 h vs. 48 h, plus longer 'recovery_h' or extra transfers. Is loss
+  permanent? *Ready (extra transfers is a small change).*
+- [ ] **Protection-score distribution:** compare with the lab-meeting results at 50 and 70 µg/ml.
+  *Ready.*
 
-**Core tasks:**
+### Analytical checks and structural changes
 
-- sweep '(i, h_i)', '(i, d_b)', and justified '(h_i, d_b)' response planes;
-- track 'iota', 'beta', 'phi', free Bla, antibiotic concentration, and population trajectories;
-- calculate final resistant fraction, Shannon diversity, total biomass, steady-state time,
-  susceptible recovery, resistant extinction, and peak population loss;
-- group representative trajectories by observed endpoint behavior;
-- test selected inhibitor regimes across initial susceptible/resistant fractions;
-- explicitly account for the fact that increasing 'h_i' has opposite effects below and above the
-  scaled transition dose 'i=1'.
-
-### Person 4 — degradation, nutrient dynamics, and observation/inference
-
-**Parameters:** 'kappa_b', 'd_a', 'phi_max', 'xi'
-
-**Purpose:** determine how quickly antibiotic clears and how nutrient recycling affects population
-recovery and ecological outcomes.
-
-**Core tasks:**
-
-- sweep free-Bla antibiotic degradation, basal antibiotic decay, resistant-cell degradation, and
-  nutrient recycling;
-- quantify crash-and-recovery versus crash-and-die behavior;
-- evaluate robustness of the other workstreams’ conclusions to degradation and nutrient settings;
-- add synthetic observation noise and sampling schedules where appropriate;
-- assess parameter sensitivity, identifiability, and model distinguishability;
-- store inference reports under 'results/reports/'.
+- [ ] **Small cases (1S, 1R + 1S, 1R + nS):** 'n_strains' = 1, 2, 5, 10, to test derived survival
+  conditions against simulation in the style of notebook 06. *Ready.*
+- [ ] **Time rescaling:** scale all rates by one factor to test whether growth rate alone can change
+  the outcome. *Ready.*
+- [ ] **Stochastic transfer and persisters:** binomial sampling at the split and a persister
+  subpopulation. *Small change. Partly covered: demographic noise (tau-leaping) in
+  'test_resistance_distribution/stochastic_community_resilience.ipynb' (Kylie), negligible at
+  10⁹ cells/OD; transfer sampling and persisters not yet added.*
+- [ ] **Cross-feeding:** compare with the earlier consumer-resource model's metabolite structure.
+  *Larger change.*
+- [ ] **Pathogen invasion (PA14) after recovery.** *Larger change.*
 
 ## Shared endpoints
 
@@ -264,33 +303,6 @@ docs/
 
 Member reports, combined reports, and report-specific supplementary documents belong in
 'results/reports/' with descriptive names. Do not overwrite another member’s report.
-
-## Person 3 — inhibitor pharmacodynamics results
-
-The Person 3 sweep varies inhibitor dose 'i', inhibitor Hill coefficient 'h_i', and free-Bla
-inactivation rate 'd_b'. Its matched comprehensive grid has 21 values per parameter (9,261
-simulations) at antibiotic anchor 'a0 = 2.15'; the earlier multi-anchor atlas, composition,
-robustness, ablation, and identifiability analyses are also included in the expanded report.
-
-- **Report:** [results/reports/Person_3_Expanded_Report.pdf](results/reports/Person_3_Expanded_Report.pdf)
-- **Full Person 3 plan:** [docs/Person_3_Plan.md](docs/Person_3_Plan.md)
-- **Expanded analysis:** [src/analysis/person3_expanded_analysis.py](src/analysis/person3_expanded_analysis.py)
-- **Matched comprehensive sweep and report builder:** [src/analysis/person3_comprehensive_analysis.py](src/analysis/person3_comprehensive_analysis.py)
-- **Run-level 9,261-row sweep:** [results/tables/comprehensive_inhibitor_grid_a0_2p15.csv](results/tables/comprehensive_inhibitor_grid_a0_2p15.csv)
-- **All tables:** [results/tables/](results/tables/) (the comprehensive sweep products use the 'comprehensive_' prefix)
-- **All figures:** [results/figures/](results/figures/) (each plot is provided in PNG and PDF)
-
-The checked-in outputs can be reproduced from the repository root with the 'ar_cp' environment:
-
-~~~bash
-conda run -n ar_cp python -m src.analysis.person3_comprehensive_analysis
-~~~
-
-This rebuilds the full 9,261-run sweep and its matched-analysis report appendix, using the
-checked-in Person 3 atlas tables as inputs to preserve the earlier analyses. To regenerate the
-multi-anchor atlas and its source tables as well, run 'src.analysis.person3_expanded_analysis';
-that full analysis takes substantially longer. See the plan and report for parameter ranges,
-solver tolerances, endpoint definitions, interpretation, and coordination caveats.
 
 ## Running the project
 

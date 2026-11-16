@@ -1,0 +1,11 @@
+dose,scenario,protected_richness,protected_extinct,protected_biomass_ratio,resistant_share,compositional_resilience,drug_clearance_h,carrier_survived
+50.0,immune + degrades (baseline),56,0,0.5646537923155119,0.442401623645197,0.5665526594698538,3.2999999999999883,True
+50.0,immune only,0,56,0.0,1.0,0.011895191223420754,,True
+50.0,degrades only,37,19,0.32965804093320356,0.0007691160655131143,0.32187081527678063,13.699999999999953,True
+50.0,"degrades only, no release",0,56,0.0,,0.0,,False
+50.0,neither,0,56,0.0,,0.0,,False
+70.0,immune + degrades (baseline),56,0,0.3851272418094278,0.6197808467704264,0.39211434445299476,3.899999999999986,True
+70.0,immune only,0,56,0.0,1.0,0.011895191223420754,,True
+70.0,degrades only,0,56,0.0,,0.0,19.299999999999933,False
+70.0,"degrades only, no release",0,56,0.0,,0.0,,False
+70.0,neither,0,56,0.0,,0.0,,False
