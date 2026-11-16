@@ -1,146 +1,99 @@
 # BME574 antibiotic–resistance community project
 
-This repository contains the shared model, sweep infrastructure, notebook, and result-storage
-conventions for the BME574 group project. The project studies how beta-lactam antibiotic treatment
-and beta-lactamase (Bla) inhibition reshape a community containing susceptible and resistant
-populations.
+This repository holds the models, analyses and reports for the BME574 group project. It asks how
+β-lactam treatment reshapes a community of susceptible and resistant bacteria, and when a
+β-lactamase (Bla) producer protects the rest of the community.
 
-The model is based on:
+The project has had two phases:
 
-- Ma HR, Xu HZ, Kim K, Anderson DJ, You L. “Private benefit of beta-lactamase dictates selection
-  dynamics of combination antibiotic treatment.” *Nature Communications* 15, 8337 (2024).
-- The accompanying supplementary information, especially Sections 1–3.
-- The project proposal and midterm-presentation work division supplied by the group.
+| Phase | Model | Status | Where |
+|---|---|---|---|
+| 1 | Two-population model of Ma et al. (2024): susceptible and resistant cells, nutrient, drug, free Bla and an inhibitor | **complete** (Person 1–4 sweeps) | [Two-species-model-summary/](Two-species-model-summary/), plus `src/`, `notebooks/`, `results/` |
+| 2 | 57-strain consumer-resource model of the barcoded *E. coli* cross-protection experiment (one *bla*TEM-1 carrier, k30, plus 56 susceptible strains) | **current** | [updated_consumer_resource_model/](updated_consumer_resource_model/) |
 
-The local source PDFs used during model curation are outside this cloned repository in the parent
-project directory. The repository itself contains the implementation and generated/shared tables.
+A generalized Lotka–Volterra model (`glv_antibiotic/`) was tried and dropped. Several earlier
+25-species consumer-resource prototypes are also kept for reference; see the
+[repository map](#repository-map).
 
-## Project question and general idea
+**Start here:** [updated_consumer_resource_model/FINDINGS_SUMMARY.md](updated_consumer_resource_model/FINDINGS_SUMMARY.md)
+(also as PDF) summarizes every phase-2 analysis so far, what each covers and what is still open.
 
-The main question is:
+## Project question
+
+The original question (phase 1) was:
 
 > How do antibiotic exposure, inhibitor action, resistance burden/private benefit, Bla-mediated
 > antibiotic degradation, nutrient recycling, and initial susceptible/resistant composition combine
 > to determine final community composition, diversity, recovery, and selection for resistance?
 
-The workflow is:
+Phase 2 asks the same question of a specific experiment: the lab's barcoded community, grown for
+4 h, treated with carbenicillin (50 or 70 µg/ml) until 24 h, diluted 1:100 into drug-free medium
+and sampled at 4, 6, 24 and 48 h, in M9CA and in LB. In particular:
 
-~~~text
-antibiotic + inhibitor treatment
-        ↓
-drug and free-Bla dynamics
-        ↓
-population-specific growth and lysis
-        ↓
-final composition, diversity, recovery, and resistance selection
-~~~
+- How does a single resistant strain protect the 56 susceptible ones, and at what cost in takeover?
+- How do the number, identity and growth of resistant strains change recovery?
+- Why does resistance protect diversity in M9CA but not in LB?
 
-The base model has two live populations:
-
-- 'n_s': susceptible population density;
-- 'n_r': resistant Bla-producing population density.
-
-It also tracks:
-
-- 's': shared nutrient;
-- 'a': antibiotic concentration;
-- 'b': free extracellular Bla.
-
-The model is dimensionless, so numerical values should be interpreted according to the scaling in
-Ma et al., not as direct clinical concentrations without an additional dimensional mapping.
-
-## Base model equations
-
-The five-state ODE system is:
-
-~~~text
-dnₛ/dτ = (g − l)nₛ
-dnᵣ/dτ = (αg − βl)nᵣ
-ds/dτ  = (ξl − g)nₛ + (ξβl − αg)nᵣ
-da/dτ  = −κ_bba − φnᵣa − dₐa
-db/dτ  = βlnᵣ − dᵦιb
-~~~
-
-The closure relations are:
-
-~~~text
-g = s/(1 + s)
-l = γ[aʰᵃ/(1 + aʰᵃ)]g
-ι = iʰⁱ/(1 + iʰⁱ)
-β = βₘᵢₙ + c(1 − βₘᵢₙ)ι
-φ = φₘₐₓ(1 − cι)
-~~~
-
-Here:
-
-- 'alpha' is the resistant growth-rate factor; '1-alpha' is the burden of resistance;
-- 'beta' is the resistant lysis-rate factor; '1-beta' is the private Bla benefit;
-- 'gamma' and 'h_a' determine antibiotic-driven lysis;
-- 'i' and 'h_i' determine inhibitor activity 'iota';
-- 'c' controls inhibitor effectiveness against intracellular/private and extracellular/public Bla;
-- 'kappa_b' controls antibiotic degradation by free Bla;
-- 'phi_max' controls antibiotic degradation by living resistant cells;
-- 'd_b' controls inhibitor-dependent free-Bla inactivation;
-- 'xi' controls nutrient recycling;
-- 'd_a' is basal antibiotic decay.
-
-The paper’s general selection criterion is:
-
-~~~text
-1 − β > (1 − α)/(l/g)
-~~~
-
-Under saturating antibiotic and inhibitor concentrations, the simplified criterion is:
-
-~~~text
-(1 − c)(1 − βₘᵢₙ) > (1 − α)/γ
-~~~
-
-These criteria are interpretation tools. Dynamic simulations are still required because the
-populations continuously change the antibiotic, Bla, and nutrient environment.
-
-## Shared baseline values and parameter ranges
-
-The base values and randomized ranges below come from the supplementary information. A parameter
-should not be silently changed in one person’s analysis: record deviations in the relevant report
-and preserve the shared baseline for comparison.
-
-| Parameter | Base value | Range or role |
-|---|---:|---|
-| 'alpha' | 0.95 | 0.75–1.00 |
-| 'beta_min' | 0.90 | 0–1 |
-| 'c' | 0.70 | 0–1 |
-| 'gamma' | 1.38 | 1.1–1.4 |
-| 'h_a' | 3 | 1–5 |
-| 'h_i' | 2 | 1–5 |
-| 'kappa_b' | 0.35 | 0–1 |
-| 'd_a' | 0.02 | fixed in the base model |
-| 'd_b' | 1 | 1–10 |
-| 'xi' | 0.8 | 0–1 |
-| 'phi_max' | 1 | 0–5 |
-| 'a0' | treatment-dependent | paper’s base dose example: 2.15; dose range 1–100 |
-| 'i' | treatment-dependent | inhibitor dose range 0.1–10 |
-
-Default initial conditions are:
-
-~~~text
-nₛ(0) = 0.2,  nᵣ(0) = 0.2,  s(0) = 4,  b(0) = 0,  a(0) = a₀
-~~~
+The phase-2 model has **no β-lactamase inhibitor**, so the inhibitor part of the original question
+is covered only by phase 1.
 
 ## Project status
 
-The Person 1–Person 4 sweeps of the two-population model are complete; the notebooks, tables and
-reports are in [Two-species-model-summary/](Two-species-model-summary/) (notebooks 02–05 cover the
-four parameter blocks, and notebook 06 checks the paper's selection criterion). The gLV model in
-'glv_antibiotic/' has been dropped.
+**Phase 1.** The Person 1–Person 4 sweeps of the two-population model are complete; the
+notebooks, tables and reports are in [Two-species-model-summary/](Two-species-model-summary/)
+(notebooks 02–05 cover the four parameter blocks, and notebook 06 checks the paper's selection
+criterion).
 
-Work now continues in the 57-strain consumer-resource model of the barcoded *E. coli*
-cross-protection experiment:
-[updated_consumer_resource_model/resilience_model.py](updated_consumer_resource_model/resilience_model.py).
-Its equations, assumptions, parameters and readouts are documented in that folder's README.
-A summary of all analyses so far, with what they cover and what is still open, is in
-[updated_consumer_resource_model/FINDINGS_SUMMARY.md](updated_consumer_resource_model/FINDINGS_SUMMARY.md)
-(also as PDF).
+**Phase 2.** The model is
+[updated_consumer_resource_model/resilience_model.py](updated_consumer_resource_model/resilience_model.py);
+its equations, assumptions, parameters and readouts are documented in
+[updated_consumer_resource_model/README (3).md](updated_consumer_resource_model/README%20(3).md).
+(The `ReadME.md` file beside it is empty.) Completed analyses:
+
+| Analysis | Folder (in `updated_consumer_resource_model/`) | Author |
+|---|---|---|
+| Number and identity of resistant strains, including a stochastic version | `test_resistance_distribution/` | Kylie |
+| Private vs. public benefit of resistance | `test_protection_mechanism/` | Sarvesh |
+| Medium ablation, M9CA vs. LB | `test_medium_ablation/` | Sarvesh |
+
+The full write-up of the last two is `REPORT_protection_and_medium.md` (also as PDF). The
+checklist below tracks what has been run.
+
+**Not yet possible:** no experimental data (barcode counts, OD curves, measured strain traits) are
+in the repository, only the lab-meeting slides. Comparing the model with the data is the main open
+task.
+
+## Running the 57-strain model
+
+The phase-2 model needs only NumPy, SciPy, pandas and Matplotlib, so the 'ar_cp' environment
+below works. From `updated_consumer_resource_model/`:
+
+~~~python
+from resilience_model import run, sweep, grid, check
+
+check()                                  # once per session; 20/20 checks should pass
+r = run()                                # the baseline experiment (M9CA, 50 µg/ml, k30 resistant)
+r.metrics                                # one row of readouts at 48 h
+r.timeseries                             # per-strain abundance at 4, 6, 24, 48 h
+r = run(dose=70, growth_mean=1.4)        # anything not named keeps its baseline value
+df = sweep("n_resistant", [1, 2, 4, 8])
+df = grid("carrier_lysis", [0, 0.5, 1], "vmax", [1e3, 1e4])
+~~~
+
+Units are hours, OD and µg/ml of carbenicillin. Each analysis folder sits one level below the model
+and imports it with `sys.path.insert(0, "..")`; open a notebook from its own folder and Run All.
+Kylie's `test_resistance_distribution/` notebooks embed their own copy of the model and check its
+hash, so they run on their own.
+
+When adding a phase-2 analysis:
+
+1. import `resilience_model` rather than copying its equations; add new terms to the model with a
+   default that reproduces the existing behavior, plus a check in `check()`;
+2. make a `test_<topic>/` folder with the notebook and a `<topic>_results/` folder for CSVs and
+   `figures/`;
+3. add a row to the "Characterizations" table in the model README, and tick or annotate the
+   checklist below;
+4. state the parameter values used, and flag any value that is assumed rather than measured.
 
 ## Possible tests: consumer-resource model
 
@@ -238,6 +191,35 @@ rough 'n_resistant' sweep (at 'gamma=4', 'vmax=3000'), single sweeps of 'dose', 
 
 ## Shared endpoints
 
+### Phase 2 (57-strain model)
+
+These come from `run().metrics`. All are at 48 h (after the 1:100 transfer and 24 h drug-free
+regrowth), and "treated" is compared with a matched untreated run of the same community unless
+stated. "Protected" strains are those without the resistance gene.
+
+| Readout | Definition | Use it for |
+|---|---|---|
+| `protected_richness` | protected strains above the detection limit (10⁻⁴ relative abundance) | survival, comparable with the lab's richness |
+| `protected_extinct` | protected strains truly gone (below one cell) | telling extinction from non-detection |
+| `protected_biomass_ratio` | protected biomass, treated ÷ untreated | how much of the susceptible community regrew |
+| `compositional_resilience` | 1 − Bray–Curtis distance between treated and untreated communities | recovery of the composition |
+| `resistant_share` | carrier fraction of the treated community | takeover by the resistant strain |
+| `protected_change_4_6h` | protected biomass at 6 h ÷ at 4 h | the lab's early-decline panel |
+| `drug_clearance_h` | hours from drug addition until the drug falls below the median susceptible IC50 | mechanism: how fast the community detoxifies |
+
+Conventions:
+
+- **Always report takeover with recovery.** Survival, composition and carrier share can move in
+  opposite directions; a community can keep every strain while the carrier takes over.
+- **Report detected and extinct strains separately.** A strain below the detection limit is not
+  necessarily extinct.
+- **Say which reference you use.** The metrics above compare treated with untreated at 48 h.
+  `test_resistance_distribution/` instead compares each community with itself at 4 h (Shannon
+  retention, Bray–Curtis to baseline), adjusted by the untreated control. Both are valid, but
+  they are not interchangeable.
+
+### Phase 1 (two-population model)
+
 All workstreams should use the same definitions unless a report explicitly justifies an alternative:
 
 - final resistant fraction: fᵣ = nᵣ/(nₛ + nᵣ);
@@ -257,34 +239,131 @@ analysis module and report. Do not infer extinction merely from a population bei
 
 ~~~text
 BME574/
-├── README.md
-├── LICENSE
-├── notebooks/
-│   └── 01_sweep_execution.ipynb
-├── src/
-│   ├── model/
-│   │   └── ma2024_model.py
-│   ├── analysis/
-│   │   ├── sweep_engine.py
-│   │   ├── grid_runner.py
-│   │   ├── person3_expanded_analysis.py
-│   │   └── person3_comprehensive_analysis.py
-│   └── visualization/
-│       └── plot_style.py
-└── results/
-    ├── tables/
-    │   ├── treatment_grid.csv
-    │   ├── criterion_grid.csv
-    │   └── Person 3 analysis tables (comprehensive_*.csv)
-    ├── figures/
-    │   └── Person 3 figures (PNG and PDF pairs)
-    └── reports/
-        └── Person_3_Expanded_Report.pdf
-docs/
-└── Person_3_Plan.md
+├── README.md                          this file
+├── environment.yml                    the 'ar_cp' conda environment
+│
+├── updated_consumer_resource_model/   PHASE 2: current work
+│   ├── resilience_model.py            the 57-strain model
+│   ├── README (3).md                  model documentation (ReadME.md is empty)
+│   ├── FINDINGS_SUMMARY.md / .pdf     summary of all phase-2 analyses
+│   ├── REPORT_protection_and_medium.md / .pdf
+│   ├── example_usage_executed.ipynb
+│   ├── test_resistance_distribution/  number and identity of resistant strains (Kylie)
+│   ├── test_protection_mechanism/     private vs. public benefit
+│   └── test_medium_ablation/          M9CA vs. LB
+│
+├── Two-species-model-summary/         PHASE 1: final notebooks, sweep package, results, reports
+├── src/                               PHASE 1: shared package (model, sweep engine, plotting)
+├── notebooks/                         PHASE 1: sweep notebooks
+├── results/                           PHASE 1: tables, figures, Person 3 and sweep reports
+├── docs/                              PHASE 1: Person 3 plan
+│
+├── glv_antibiotic/                    dropped gLV model (kept for reference)
+├── consumer_resource_model/           earlier 25-species prototype (Kylie, Oct)
+├── consumer_resource_model_antibiotic/  25-species prototype with antibiotic and resistance cost
+├── consumer_resource/                 25-species prototypes: baseline cross-feeding and batch models
+├── consumer_resource_aligned/         25-species no-antibiotic control matched to the prototype above
+│
+├── param_sweep/                       copies of phase-1 sweep scripts and notebooks
+├── trash/                             superseded notebooks
+├── presentation_midterm/              placeholder
+└── ma2024_model.py, *.zip             loose copies; the maintained versions are in src/ and
+                                       Two-species-model-summary/
 ~~~
 
-### Where to find shared project components
+The 25-species prototypes, `param_sweep/`, `trash/`, the zip files and the root-level
+`ma2024_model.py` (which differs from `src/model/ma2024_model.py`) are superseded. They are left
+in place until the group agrees what to delete.
+
+## Phase 1 reference: the two-population model
+
+This section documents the Ma et al. model used in phase 1. It is not used by the phase-2 model.
+
+The model has two live populations, 'n_s' (susceptible) and 'n_r' (resistant, Bla-producing), and
+tracks a shared nutrient 's', antibiotic 'a' and free extracellular Bla 'b'. It is dimensionless,
+so numerical values should be interpreted according to the scaling in Ma et al., not as direct
+clinical concentrations without an additional dimensional mapping. The source PDFs (paper,
+supplement, proposal) are in the parent project directory, outside this repository.
+
+### Equations
+
+The five-state ODE system is:
+
+~~~text
+dnₛ/dτ = (g − l)nₛ
+dnᵣ/dτ = (αg − βl)nᵣ
+ds/dτ  = (ξl − g)nₛ + (ξβl − αg)nᵣ
+da/dτ  = −κ_bba − φnᵣa − dₐa
+db/dτ  = βlnᵣ − dᵦιb
+~~~
+
+The closure relations are:
+
+~~~text
+g = s/(1 + s)
+l = γ[aʰᵃ/(1 + aʰᵃ)]g
+ι = iʰⁱ/(1 + iʰⁱ)
+β = βₘᵢₙ + c(1 − βₘᵢₙ)ι
+φ = φₘₐₓ(1 − cι)
+~~~
+
+Here:
+
+- 'alpha' is the resistant growth-rate factor; '1-alpha' is the burden of resistance;
+- 'beta' is the resistant lysis-rate factor; '1-beta' is the private Bla benefit;
+- 'gamma' and 'h_a' determine antibiotic-driven lysis;
+- 'i' and 'h_i' determine inhibitor activity 'iota';
+- 'c' controls inhibitor effectiveness against intracellular/private and extracellular/public Bla;
+- 'kappa_b' controls antibiotic degradation by free Bla;
+- 'phi_max' controls antibiotic degradation by living resistant cells;
+- 'd_b' controls inhibitor-dependent free-Bla inactivation;
+- 'xi' controls nutrient recycling;
+- 'd_a' is basal antibiotic decay.
+
+The paper’s general selection criterion is:
+
+~~~text
+1 − β > (1 − α)/(l/g)
+~~~
+
+Under saturating antibiotic and inhibitor concentrations, the simplified criterion is:
+
+~~~text
+(1 − c)(1 − βₘᵢₙ) > (1 − α)/γ
+~~~
+
+These criteria are interpretation tools. Dynamic simulations are still required because the
+populations continuously change the antibiotic, Bla, and nutrient environment.
+
+### Shared baseline values and parameter ranges
+
+The base values and randomized ranges below come from the supplementary information. A parameter
+should not be silently changed in one person’s analysis: record deviations in the relevant report
+and preserve the shared baseline for comparison.
+
+| Parameter | Base value | Range or role |
+|---|---:|---|
+| 'alpha' | 0.95 | 0.75–1.00 |
+| 'beta_min' | 0.90 | 0–1 |
+| 'c' | 0.70 | 0–1 |
+| 'gamma' | 1.38 | 1.1–1.4 |
+| 'h_a' | 3 | 1–5 |
+| 'h_i' | 2 | 1–5 |
+| 'kappa_b' | 0.35 | 0–1 |
+| 'd_a' | 0.02 | fixed in the base model |
+| 'd_b' | 1 | 1–10 |
+| 'xi' | 0.8 | 0–1 |
+| 'phi_max' | 1 | 0–5 |
+| 'a0' | treatment-dependent | paper’s base dose example: 2.15; dose range 1–100 |
+| 'i' | treatment-dependent | inhibitor dose range 0.1–10 |
+
+Default initial conditions are:
+
+~~~text
+nₛ(0) = 0.2,  nᵣ(0) = 0.2,  s(0) = 4,  b(0) = 0,  a(0) = a₀
+~~~
+
+### Where to find the two-species components
 
 - **Base equations and parameter definitions:** [src/model/ma2024_model.py](src/model/ma2024_model.py)
 - **Base parameter values:** 'DEFAULT_PARAMS' in [src/model/ma2024_model.py](src/model/ma2024_model.py)
@@ -304,7 +383,7 @@ docs/
 Member reports, combined reports, and report-specific supplementary documents belong in
 'results/reports/' with descriptive names. Do not overwrite another member’s report.
 
-## Running the project
+### Running the two-species code
 
 The project is intended to run in the minimal 'ar_cp' environment defined in
 [environment.yml](environment.yml). It contains Python 3.11, NumPy, SciPy, pandas, Matplotlib,
@@ -342,13 +421,15 @@ When adding a new analysis:
 4. save tables under 'results/tables/';
 5. save plots under 'results/figures/' in both PNG and PDF format;
 6. save reports under 'results/reports/';
-7. update this README only when a shared convention or repository location changes.
+7. update this README when a shared convention or repository location changes.
 
 ## References
 
-The primary model reference is Ma et al. (2024), DOI:
-[10.1038/s41467-024-52711-w](https://doi.org/10.1038/s41467-024-52711-w).
-
-The code comments identify the corresponding main-text and supplementary-information equations.
-The full proposal, Ma paper, and supplementary PDF remain in the parent project workspace used to
-curate this repository.
+- Ma HR, Xu HZ, Kim K, Anderson DJ, You L. “Private benefit of beta-lactamase dictates selection
+  dynamics of combination antibiotic treatment.” *Nature Communications* 15, 8337 (2024).
+  DOI: [10.1038/s41467-024-52711-w](https://doi.org/10.1038/s41467-024-52711-w). The code comments
+  identify the corresponding main-text and supplementary-information equations.
+- The phase-2 model's references (TEM-1 kinetics, killing ∝ growth, lag phase) are listed in
+  [updated_consumer_resource_model/README (3).md](updated_consumer_resource_model/README%20(3).md).
+- The lab-meeting slides describing the experiment (18 Sep 2026) are in the parent project
+  directory, outside this repository.
