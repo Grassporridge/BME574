@@ -9,6 +9,7 @@
 | A. Number and identity of resistant strains | Kylie | `test_resistance_distribution/` | notebooks in that folder |
 | B. Private vs. public benefit of resistance | Sarvesh | `test_protection_mechanism/` | `REPORT_protection_and_medium.md` §2 |
 | C. Medium ablation (M9CA vs. LB) | Sarvesh | `test_medium_ablation/` | `REPORT_protection_and_medium.md` §3 |
+| D. Fitness cost × dose; treatment duration | — | `test_cost_and_duration/` | `REPORT_cost_and_duration.md` |
 
 **Common setup.** All three analyses share the same protocol:
 
@@ -17,7 +18,7 @@
 - **Dose:** 50 µg/ml unless stated.
 - **Carriers:** immune to the drug and degrade it, unless stated.
 
-**Model changes** (needed for B and C):
+**Model changes** (needed for B and C; D uses the model unchanged):
 
 - **New terms:** private-protection strength (`carrier_lysis`, Ma et al.'s β), enzyme released by lysed carriers (`free_enzyme_activity` = 0.35, Ma et al.'s κ_b/φ_max), its decay, and a Baranyi–Roberts lag phase (`lag_h`).
 - **Backward compatibility:** at their defaults these reproduce the previous model to about 10⁻¹⁴. Analysis A embeds its own copy of the original model, so it is unaffected.
@@ -121,11 +122,37 @@
 
 ---
 
+## D. Fitness cost and treatment duration (summary)
+
+![Cost x dose](test_cost_and_duration/cost_and_duration_results/figures/01_cost_x_dose_heatmaps.png)
+
+**Fitness cost × dose:**
+- **The cost changes takeover, not survival.** With an immune degrader, all 56 strains survive up to 500 µg/ml at any cost up to 0.45.
+- **The cost has two opposing effects:** less takeover (good) and slower clearance (bad), because the carrier has less biomass when the drug arrives.
+- **The best cost for composition rises with dose:** about 0 at 20 µg/ml, 0.3 at 50, 0.4 at 70 and 0.5 at 100–280. At 50 µg/ml, compositional resilience is 0.57 at the baseline cost 0.05 and 0.79 at cost 0.3. This holds in all 12 trait draws.
+- **High dose and high cost together collapse recovery.** At cost 0.5 the immune degrader cannot rescue above about 200 µg/ml.
+- **For a partly protected carrier the cost is purely harmful.** Its rescue limit falls from 60 to 18 µg/ml.
+
+**Treatment duration:**
+- **With an effective degrader, composition after recovery is fixed by the drug clearance time:** about 3.5 h at 50 µg/ml and 6 h at 150 µg/ml. Shorter treatments preserve composition; anything longer, including the protocol's 20 h, gives the same result.
+- **When clearance is slow, duration matters non-monotonically.** The 1:100 transfer is most damaging when it catches the susceptible strains near their minimum. With partial protection at 70 µg/ml, 42–55 strains are extinct after 12–20 h but only 7 after 44 h, because survivors regrow before the bottleneck.
+- **The all-sensitive community survives up to about 10 h of drug at any dose ≥ 50 µg/ml, and is gone by 16 h.**
+
+**Growth-rate–dependent killing:**
+- Killing is proportional to current growth, so at high doses (≥ 150 µg/ml) or with lingering drug, **faster-growing strains are lost preferentially** (ρ down to −0.99).
+- At moderate doses with fast clearance, IC50 decides instead (ρ ≈ +0.95).
+
+**Environment.** These results were produced with scipy 1.14.1. With scipy 1.18, the baseline LSODA solve fails.
+
+---
+
 ## Checklist coverage
 
 | Item | Status |
 |---|---|
 | Number of resistant strains | done at 50 µg/ml (A); other doses not run |
+| Cost of resistance | done (D) |
+| Treatment length and transfer timing | done (D) |
 | Which strain carries resistance | partly: random identities (A), carrier growth for non-immune carriers (B); fastest/median/slowest design not run |
 | Private vs. public benefit | done (B) |
 | Detoxification strength | partly: `vmax` × `carrier_lysis` within the physical range (B); `km` not swept |

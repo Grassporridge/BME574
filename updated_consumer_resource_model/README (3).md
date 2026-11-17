@@ -230,8 +230,10 @@ Run it once per session. It takes a few seconds and is not run on import.
 | `test_resistance_distribution/` | how many strains carry resistance, and which |
 | `test_protection_mechanism/` | private vs. public benefit: immune only, degrades only, both, partial protection, released enzyme |
 | `test_medium_ablation/` | which M9CA → LB difference (growth, food, lag, enzyme activity, killing, IC50) explains LB's strain loss |
+| `test_cost_and_duration/` | how the fitness cost of resistance shapes recovery across doses; how treatment duration shapes composition after recovery; when growth rate vs. IC50 decides which strains are lost |
+| `test_extinction_conditions/` | when dose, drug exposure time and degradation rate permanently remove susceptible strains, for 1–20 resistant strains (`REPORT_extinction_conditions.md`) |
 
-Results of all three, and what they leave open, are summarized in `FINDINGS_SUMMARY.md`; the full write-up of the last two is `REPORT_protection_and_medium.md` (both also as PDF).
+Results of all three, and what they leave open, are summarized in `FINDINGS_SUMMARY.md`; the full write-up of the last two is `REPORT_protection_and_medium.md` (both also as PDF). The cost and duration analysis is written up in `REPORT_cost_and_duration.md`.
 
 ## References
 

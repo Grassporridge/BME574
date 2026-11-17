@@ -129,7 +129,8 @@ rough 'n_resistant' sweep (at 'gamma=4', 'vmax=3000'), single sweeps of 'dose', 
 
 ### Resistance traits
 
-- [ ] **Cost of resistance:** 'resistance_cost' 0 → 0.5. *Ready.*
+- [x] **Cost of resistance:** 'resistance_cost' 0 → 0.5. *Done: × dose 10–500 µg/ml, rescue limits,
+  four carrier types, 12 seeds; see 'updated_consumer_resource_model/test_cost_and_duration/'.*
 - [ ] **Detoxification strength:** 'vmax', 'km'. How much drug-removal capacity does recovery need?
   *Ready. Partly covered: 'vmax' × 'carrier_lysis' in 'test_protection_mechanism/' §3, with a
   kinetic ceiling of ≈ 3e4 µg/ml/h/OD (the default 1e4 is at the ceiling). 'km' not swept.*
@@ -143,11 +144,14 @@ rough 'n_resistant' sweep (at 'gamma=4', 'vmax=3000'), single sweeps of 'dose', 
 ### Drug and treatment protocol
 
 - [ ] **Dose response:** 'dose' 5 → 500, including 50 vs. 70 µg/ml. Locate the transitions between
-  full recovery, partial strain loss and collapse. *Ready.*
+  full recovery, partial strain loss and collapse. *Ready. Partly covered: 10–500 µg/ml against
+  'resistance_cost' and 'treatment_h' in 'test_cost_and_duration/'.*
 - [ ] **Growth phase at drug addition:** 'pregrowth_h' 0 → 8. Exponential vs. near-stationary
   treatment. *Ready.*
-- [ ] **Treatment length and transfer timing:** 'treatment_h'. Is the drug cleared before the 1:100
-  transfer? *Ready.*
+- [x] **Treatment length and transfer timing:** 'treatment_h'. Is the drug cleared before the 1:100
+  transfer? *Done: 0.5–44 h × dose, weaker-protection scenarios, × cost; see
+  'updated_consumer_resource_model/test_cost_and_duration/'. Note that the model's built-in
+  'metrics' read at clock hours 24 and 48, so non-default schedules need schedule-relative readouts.*
 - [ ] **Killing shape:** 'gamma', 'hill'. *Ready.*
 - [ ] **Repeated treatment cycles:** several treat → transfer cycles. Does strain loss accumulate?
   *Small change.*

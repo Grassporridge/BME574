@@ -1,0 +1,67 @@
+carrier,criterion,resistance_cost,max_rescued_dose,capped_at_500
+immune degrader (baseline),survived,0.0,500.0,True
+immune degrader (baseline),survived,0.05,500.0,True
+immune degrader (baseline),survived,0.1,500.0,True
+immune degrader (baseline),survived,0.15,500.0,True
+immune degrader (baseline),survived,0.2,500.0,True
+immune degrader (baseline),survived,0.25,500.0,True
+immune degrader (baseline),survived,0.3,500.0,True
+immune degrader (baseline),survived,0.35,500.0,True
+immune degrader (baseline),survived,0.4,500.0,True
+immune degrader (baseline),survived,0.45,500.0,True
+immune degrader (baseline),survived,0.5,202.96002660783392,False
+immune degrader (baseline),detected,0.0,325.94562800751794,False
+immune degrader (baseline),detected,0.05,347.8169294759303,False
+immune degrader (baseline),detected,0.1,372.5764702535138,False
+immune degrader (baseline),detected,0.15,400.6261388604811,False
+immune degrader (baseline),detected,0.2,430.78754551796277,False
+immune degrader (baseline),detected,0.25,464.9927127985829,False
+immune degrader (baseline),detected,0.3,500.0,True
+immune degrader (baseline),detected,0.35,500.0,True
+immune degrader (baseline),detected,0.4,500.0,True
+immune degrader (baseline),detected,0.45,500.0,True
+immune degrader (baseline),detected,0.5,202.96002660783392,False
+vmax = 3000,survived,0.0,500.0,True
+vmax = 3000,survived,0.05,500.0,True
+vmax = 3000,survived,0.1,500.0,True
+vmax = 3000,survived,0.15,500.0,True
+vmax = 3000,survived,0.2,500.0,True
+vmax = 3000,survived,0.25,500.0,True
+vmax = 3000,survived,0.3,500.0,True
+vmax = 3000,survived,0.35,354.52467600447414,False
+vmax = 3000,survived,0.4,233.77554371902394,False
+vmax = 3000,survived,0.45,154.74293616762475,False
+vmax = 3000,survived,0.5,60.45884357698239,False
+vmax = 3000,detected,0.0,91.3372809116281,False
+vmax = 3000,detected,0.05,97.8391758442655,False
+vmax = 3000,detected,0.1,104.80391176902701,False
+vmax = 3000,detected,0.15,112.69414432137998,False
+vmax = 3000,detected,0.2,121.64222580183312,False
+vmax = 3000,detected,0.25,131.30079816593408,False
+vmax = 3000,detected,0.3,142.81330666546927,False
+vmax = 3000,detected,0.35,155.929804327102,False
+vmax = 3000,detected,0.4,171.55678297594434,False
+vmax = 3000,detected,0.45,154.74293616762475,False
+vmax = 3000,detected,0.5,,False
+partial protection (carrier_lysis 0.8),survived,0.0,60.228311178722045,False
+partial protection (carrier_lysis 0.8),survived,0.05,53.09440063433922,False
+partial protection (carrier_lysis 0.8),survived,0.1,46.805486050481285,False
+partial protection (carrier_lysis 0.8),survived,0.15,41.10414756916304,False
+partial protection (carrier_lysis 0.8),survived,0.2,36.23545200020749,False
+partial protection (carrier_lysis 0.8),survived,0.25,31.94344267692294,False
+partial protection (carrier_lysis 0.8),survived,0.3,28.159812386168632,False
+partial protection (carrier_lysis 0.8),survived,0.35,24.919363451793977,False
+partial protection (carrier_lysis 0.8),survived,0.4,22.136210812912356,False
+partial protection (carrier_lysis 0.8),survived,0.45,19.66389832154486,False
+partial protection (carrier_lysis 0.8),survived,0.5,17.601685561485198,False
+partial protection (carrier_lysis 0.8),detected,0.0,60.228311178722045,False
+partial protection (carrier_lysis 0.8),detected,0.05,53.09440063433922,False
+partial protection (carrier_lysis 0.8),detected,0.1,35.41430968385576,False
+partial protection (carrier_lysis 0.8),detected,0.15,24.729688365860227,False
+partial protection (carrier_lysis 0.8),detected,0.2,19.145008659770205,False
+partial protection (carrier_lysis 0.8),detected,0.25,15.516804750974403,False
+partial protection (carrier_lysis 0.8),detected,0.3,12.867788855725971,False
+partial protection (carrier_lysis 0.8),detected,0.35,10.835330389072208,False
+partial protection (carrier_lysis 0.8),detected,0.4,,False
+partial protection (carrier_lysis 0.8),detected,0.45,,False
+partial protection (carrier_lysis 0.8),detected,0.5,,False
